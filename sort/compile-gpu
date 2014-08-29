@@ -1,0 +1,3 @@
+#!/bin/bash
+
+java -jar lib/Rootbeer.jar sorter.jar sorter-gpu.jar -64bit
