@@ -1,3 +1,4 @@
 #!/bin/bash
 
-java -jar lib/Rootbeer.jar sorter.jar sorter-gpu.jar -64bit -noexceptions
+cp ~/code/rootbeer1/Rootbeer.jar lib/Rootbeer.jar
+java -jar lib/Rootbeer.jar dist/sorter.jar dist/sorter-gpu.jar -64bit -noexceptions -shared-mem-size 2048 -noarraychecks
