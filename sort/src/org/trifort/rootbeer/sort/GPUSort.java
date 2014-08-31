@@ -60,22 +60,20 @@ public class GPUSort {
     GpuDevice device0 = devices.get(0);
     Context context0 = device0.createContext(263440);
     context0.setCacheConfig(CacheConfig.PREFER_SHARED);
-    ThreadConfig config0 = new ThreadConfig(sizeBy2, outerCount,
-      (long) outerCount * (long) sizeBy2);
-    GPUSortKernel kernel = new GPUSortKernel(array);
+    context0.setThreadConfig(sizeBy2, outerCount, outerCount * sizeBy2);
+    context0.setKernel(new GPUSortKernel(array));
+    context0.buildState();
 
     while(true){
       for(int i = 0; i < outerCount; ++i){
         fisherYates(array[i]);
       }
       long gpuStart = System.currentTimeMillis();
-      rootbeer.run(kernel, config0, context0);
+      context0.run();
       long gpuStop = System.currentTimeMillis();
       long gpuTime = gpuStop - gpuStart;
 
-      List<StatsRow> stats = context0.getStats();
-      StatsRow row0 = stats.get(0);
-      stats.clear();
+      StatsRow row0 = context0.getStats();
       System.out.println("serialization_time: "+row0.getSerializationTime());
       System.out.println("execution_time: "+row0.getExecutionTime());
       System.out.println("deserialization_time: "+row0.getDeserializationTime());
