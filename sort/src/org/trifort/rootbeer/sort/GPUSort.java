@@ -45,12 +45,12 @@ public class GPUSort {
 
   public void sort(){
     //should have 192 threads per SM
-    int size = 4096;
-    int sizeBy2 = size / 4;
-    //int numMultiProcessors = 14;
-    //int blocksPerMultiProcessor = 512;
-    int numMultiProcessors = 2;
-    int blocksPerMultiProcessor = 256;
+    int size = 2048;
+    int sizeBy2 = size / 2;
+    int numMultiProcessors = 14;
+    int blocksPerMultiProcessor = 512;
+    //int numMultiProcessors = 2;
+    //int blocksPerMultiProcessor = 256;
     int outerCount = numMultiProcessors*blocksPerMultiProcessor;
     int[][] array = new int[outerCount][];
     for(int i = 0; i < outerCount; ++i){
@@ -66,12 +66,12 @@ public class GPUSort {
     context0.setKernel(new GPUSortKernel(array));
     context0.buildState();
 
-    for(int loop = 0; loop < 1; ++loop){
+    while(true){
       for(int i = 0; i < outerCount; ++i){
         fisherYates(array[i]);
       }
       long gpuStart = System.currentTimeMillis();
-      //context0.run();
+      context0.run();
       long gpuStop = System.currentTimeMillis();
       long gpuTime = gpuStop - gpuStart;
 
@@ -83,7 +83,7 @@ public class GPUSort {
       System.out.println("gpu_time: "+gpuTime);
 
       for(int i = 0; i < outerCount; ++i){
-        //checkSorted(array[i], i);
+        checkSorted(array[i], i);
         fisherYates(array[i]);
       }
 
@@ -97,7 +97,7 @@ public class GPUSort {
       double ratio = (double) cpuTime / (double) gpuTime;
       System.out.println("ratio: "+ratio);
     }
-    context0.close();
+    //context0.close();
   }
 
   public static void main(String[] args){
