@@ -47,8 +47,8 @@ public class GPUSort {
     //should have 192 threads per SM
     int size = 2048;
     int sizeBy2 = size / 2;
-    int numMultiProcessors = 2;
-    int blocksPerMultiProcessor = 16;
+    int numMultiProcessors = 14;
+    int blocksPerMultiProcessor = 512;
     int outerCount = numMultiProcessors*blocksPerMultiProcessor;
     int[][] array = new int[outerCount][];
     for(int i = 0; i < outerCount; ++i){
@@ -58,7 +58,7 @@ public class GPUSort {
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
     GpuDevice device0 = devices.get(0);
-    Context context0 = device0.createContext(263440);
+    Context context0 = device0.createContext(58978448);
     context0.setCacheConfig(CacheConfig.PREFER_SHARED);
     context0.setThreadConfig(sizeBy2, outerCount, outerCount * sizeBy2);
     context0.setKernel(new GPUSortKernel(array));
