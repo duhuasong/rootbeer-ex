@@ -15,7 +15,7 @@ public class GPUSortKernel implements Kernel {
   @Override
   public void gpuMethod(){
     int[] array = arrays[RootbeerGpu.getBlockIdxx()];
-    int index1a = RootbeerGpu.getThreadIdxx() * 2;
+    int index1a = RootbeerGpu.getThreadIdxx() << 1;
     int index1b = index1a + 1;
     int index2a = index1a - 1;
     int index2b = index1a;
