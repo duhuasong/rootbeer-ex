@@ -45,8 +45,8 @@ public class GPUSort {
 
   public void sort(){
     //should have 192 threads per SM
-    int size = 4096;
-    int sizeBy2 = size / 4;
+    int size = 2048;
+    int sizeBy2 = size / 2;
     //int numMultiProcessors = 14;
     //int blocksPerMultiProcessor = 512;
     int numMultiProcessors = 2;
@@ -60,7 +60,7 @@ public class GPUSort {
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
     GpuDevice device0 = devices.get(0);
-    Context context0 = device0.createContext();
+    Context context0 = device0.createContext(4212880);
     context0.setCacheConfig(CacheConfig.PREFER_SHARED);
     context0.setThreadConfig(sizeBy2, outerCount, outerCount * sizeBy2);
     context0.setKernel(new GPUSortKernel(array));
@@ -71,7 +71,7 @@ public class GPUSort {
         fisherYates(array[i]);
       }
       long gpuStart = System.currentTimeMillis();
-      //context0.run();
+      context0.run();
       long gpuStop = System.currentTimeMillis();
       long gpuTime = gpuStop - gpuStart;
 
@@ -83,7 +83,7 @@ public class GPUSort {
       System.out.println("gpu_time: "+gpuTime);
 
       for(int i = 0; i < outerCount; ++i){
-        //checkSorted(array[i], i);
+        checkSorted(array[i], i);
         fisherYates(array[i]);
       }
 
@@ -102,6 +102,8 @@ public class GPUSort {
 
   public static void main(String[] args){
     GPUSort sorter = new GPUSort();
-    sorter.sort();
+    while(true){
+      sorter.sort();
+    }
   }
 }
