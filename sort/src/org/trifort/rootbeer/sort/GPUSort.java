@@ -44,7 +44,7 @@ public class GPUSort {
   }
 
   public void sort(){
-    //should have 192 threads per SM
+    //should have at least 192 threads per SM
     int size = 2048;
     int sizeBy2 = size / 2;
     //int numMultiProcessors = 14;
@@ -66,7 +66,7 @@ public class GPUSort {
     context0.setKernel(new GPUSortKernel(array));
     context0.buildState();
 
-    for(int loop = 0; loop < 1; ++loop){
+    while(true){
       for(int i = 0; i < outerCount; ++i){
         fisherYates(array[i]);
       }
@@ -97,7 +97,7 @@ public class GPUSort {
       double ratio = (double) cpuTime / (double) gpuTime;
       System.out.println("ratio: "+ratio);
     }
-    context0.close();
+    //context0.close();
   }
 
   public static void main(String[] args){

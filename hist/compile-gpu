@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp ~/code/rootbeer1/Rootbeer.jar lib/Rootbeer.jar
+java -jar lib/Rootbeer.jar dist/hist.jar dist/hist-gpu.jar -64bit -noexceptions -shared-mem-size 8192 -noarraychecks
