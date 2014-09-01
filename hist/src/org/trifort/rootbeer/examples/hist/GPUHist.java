@@ -24,21 +24,40 @@ public class GPUHist {
     return ret;
   }
 
+  private void histCPU(byte[] data, int[] result){
+    for(int i = 0; i < GPUHistConstants.DATA_N; ++i){
+      int data4 = (int) data[i];
+      result[(data4 >> 2) & 0x3F]++;
+      result[(data4 >> 10) & 0x3F]++;
+      result[(data4 >> 18) & 0x3F]++;
+      result[(data4 >> 26) & 0x3F]++;
+    }
+  }
+
   public void run(){
     int size = GPUHistConstants.THREAD_N;
+    int numSMs = 1;
+    int blocksPerSM = 1;
+    int blockSize = numSMs * blocksPerSM;
     byte[] input = newArray(GPUHistConstants.DATA_N);
-    int[] result = new int[GPUHistConstants.HISTOGRAM_SIZE];
+    int[] resultGPU = new int[GPUHistConstants.BIN_COUNT];
+    int[] resultCPU = new int[GPUHistConstants.BIN_COUNT];
 
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
     GpuDevice device0 = devices.get(0);
-    Context context0 = device0.createContext();
+    Context context0 = device0.createContext(96000144);
     context0.setCacheConfig(CacheConfig.PREFER_SHARED);
-    context0.setThreadConfig(size, 1, size);
-    context0.setKernel(new GPUHistKernel(input, result));
+    context0.setThreadConfig(size, blockSize, blockSize * size);
+    context0.setKernel(new GPUHistKernel(input, resultGPU));
     context0.buildState();
 
     while(true){
+      for(int i = 0; i < GPUHistConstants.BIN_COUNT; ++i){
+        resultGPU[i] = 0;
+        resultCPU[i] = 0;
+      }
+
       long gpuStart = System.currentTimeMillis();
       context0.run();
       long gpuStop = System.currentTimeMillis();
@@ -50,6 +69,14 @@ public class GPUHist {
       System.out.println("deserialization_time: "+row0.getDeserializationTime());
       System.out.println("gpu_required_memory: "+context0.getRequiredMemory());
       System.out.println("gpu_time: "+gpuTime);
+
+      long cpuStart = System.currentTimeMillis();
+      histCPU(input, resultCPU);
+      long cpuStop = System.currentTimeMillis();
+      long cpuTime = cpuStop - cpuStart;
+      System.out.println("cpu_time: "+cpuTime);
+      double ratio = (double) cpuTime / (double) gpuTime;
+      System.out.println("ratio: "+ratio);
     }
   }
 
