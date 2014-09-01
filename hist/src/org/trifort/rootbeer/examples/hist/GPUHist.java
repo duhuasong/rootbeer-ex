@@ -36,26 +36,28 @@ public class GPUHist {
 
   public void run(){
     int size = GPUHistConstants.THREAD_N;
-    int numSMs = 1;
-    int blocksPerSM = 1;
+    int numSMs = 2;
+    int blocksPerSM = 2;
     int blockSize = numSMs * blocksPerSM;
     byte[] input = newArray(GPUHistConstants.DATA_N);
-    int[] resultGPU = new int[GPUHistConstants.BIN_COUNT];
-    int[] resultCPU = new int[GPUHistConstants.BIN_COUNT];
+    int[][] resultGPU = new int[blockSize][GPUHistConstants.BIN_COUNT];
+    int[][] resultCPU = new int[blockSize][GPUHistConstants.BIN_COUNT];
 
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
     GpuDevice device0 = devices.get(0);
-    Context context0 = device0.createContext(96000144);
+    Context context0 = device0.createContext();
     context0.setCacheConfig(CacheConfig.PREFER_SHARED);
     context0.setThreadConfig(size, blockSize, blockSize * size);
     context0.setKernel(new GPUHistKernel(input, resultGPU));
     context0.buildState();
 
     while(true){
-      for(int i = 0; i < GPUHistConstants.BIN_COUNT; ++i){
-        resultGPU[i] = 0;
-        resultCPU[i] = 0;
+      for(int i = 0; i < blockSize; ++i){
+        for(int j = 0; j < GPUHistConstants.BIN_COUNT; ++j){
+          resultGPU[i][j] = 0;
+          resultCPU[i][j] = 0;
+        }
       }
 
       long gpuStart = System.currentTimeMillis();
@@ -71,7 +73,9 @@ public class GPUHist {
       System.out.println("gpu_time: "+gpuTime);
 
       long cpuStart = System.currentTimeMillis();
-      histCPU(input, resultCPU);
+      for(int i = 0; i < blockSize; ++i){
+        histCPU(input, resultCPU[i]);
+      }
       long cpuStop = System.currentTimeMillis();
       long cpuTime = cpuStop - cpuStart;
       System.out.println("cpu_time: "+cpuTime);

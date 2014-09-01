@@ -6,9 +6,9 @@ import org.trifort.rootbeer.runtime.RootbeerGpu;
 public class GPUHistKernel implements Kernel {
 
   private byte[] inputData;
-  private int[] outputData;
+  private int[][] outputData;
 
-  public GPUHistKernel(byte[] inputData, int[] outputData){
+  public GPUHistKernel(byte[] inputData, int[][] outputData){
     this.inputData = inputData;
     this.outputData = outputData;
   }
@@ -67,6 +67,7 @@ public class GPUHistKernel implements Kernel {
     //read the handle from the field into a register because it is used
     //repeatedly in a loop
     byte[] localInputData = inputData;
+    int[] localOutputData = outputData[block_idxx];
 
     for(int pos = thread_idxx; pos < GPUHistConstants.DATA_SIZE; pos += block_dimx){
       byte data4 = localInputData[baseIndex + pos];
@@ -100,7 +101,8 @@ public class GPUHistKernel implements Kernel {
       }
 
       //value is index
-      //RootbeerGpu.atomicAdd(inputData, value, sum);
+      //RootbeerGpu.atomicAdd(localOutputData, value, sum);
+      localOutputData[value] += sum;
     }
   }
 }
