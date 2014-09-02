@@ -34,12 +34,35 @@ public class GPUHist {
     }
   }
 
+  private void verify(int[][] resultCPU, int[][] resultGPU){
+    for(int i = 0; i < resultCPU.length; ++i){
+      int[] subCPU = resultCPU[i];
+      int[] subGPU = resultGPU[i];
+      for(int j = 0; j < subCPU.length; ++j){
+        int cpu_value = subCPU[j];
+        int gpu_value = subGPU[j];
+
+        if(cpu_value != gpu_value){
+          System.out.println("VERIFY FAILED");
+          System.out.println("cpu_value: "+cpu_value);
+          System.out.println("gpu_value: "+gpu_value);
+          System.out.println("i: "+i+" j: "+j);
+          throw new RuntimeException();
+        }
+      }
+    }
+    System.out.println("VERIFY PASSED");
+  }
+
   public void run(){
     int size = GPUHistConstants.THREAD_N;
     int numSMs = 2;
     int blocksPerSM = 2;
     int blockSize = numSMs * blocksPerSM;
-    byte[] input = newArray(GPUHistConstants.DATA_N);
+    byte[][] input = new byte[blockSize][];
+    for(int i = 0; i < blockSize; ++i){
+      input[i] = newArray(GPUHistConstants.DATA_N);
+    }
     int[][] resultGPU = new int[blockSize][GPUHistConstants.BIN_COUNT];
     int[][] resultCPU = new int[blockSize][GPUHistConstants.BIN_COUNT];
 
@@ -74,13 +97,15 @@ public class GPUHist {
 
       long cpuStart = System.currentTimeMillis();
       for(int i = 0; i < blockSize; ++i){
-        histCPU(input, resultCPU[i]);
+        histCPU(input[i], resultCPU[i]);
       }
       long cpuStop = System.currentTimeMillis();
       long cpuTime = cpuStop - cpuStart;
       System.out.println("cpu_time: "+cpuTime);
       double ratio = (double) cpuTime / (double) gpuTime;
       System.out.println("ratio: "+ratio);
+
+      verify(resultCPU, resultGPU);
     }
   }
 
