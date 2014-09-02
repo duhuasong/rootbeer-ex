@@ -16,17 +16,17 @@ public class GPUHist {
 
   }
 
-  private byte[] newArray(int size){
-    byte[] ret = new byte[size];
+  private int[] newArray(int size){
+    int[] ret = new int[size];
     for(int i = 0; i < size; ++i){
-      ret[i] = (byte) (i & 0xf);
+      ret[i] = (i & 0xf);
     }
     return ret;
   }
 
-  private void histCPU(byte[] data, int[] result){
+  private void histCPU(int[] data, int[] result){
     for(int i = 0; i < GPUHistConstants.DATA_N; ++i){
-      int data4 = (int) data[i];
+      int data4 = data[i];
       result[(data4 >> 2) & 0x3F]++;
       result[(data4 >> 10) & 0x3F]++;
       result[(data4 >> 18) & 0x3F]++;
@@ -56,10 +56,10 @@ public class GPUHist {
 
   public void run(){
     int size = GPUHistConstants.THREAD_N;
-    int numSMs = 14;
-    int blocksPerSM = 32;
+    int numSMs = 2;
+    int blocksPerSM = 2;
     int blockSize = numSMs * blocksPerSM;
-    byte[][] input = new byte[blockSize][];
+    int[][] input = new int[blockSize][];
     for(int i = 0; i < blockSize; ++i){
       input[i] = newArray(GPUHistConstants.DATA_N);
     }
@@ -69,7 +69,7 @@ public class GPUHist {
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
     GpuDevice device0 = devices.get(0);
-    Context context0 = device0.createContext();
+    Context context0 = device0.createContext(2*blockSize*GPUHistConstants.INT_SIZE*GPUHistConstants.DATA_N);
     context0.setCacheConfig(CacheConfig.PREFER_SHARED);
     context0.setThreadConfig(size, blockSize, blockSize * size);
     context0.setKernel(new GPUHistKernel(input, resultGPU));
@@ -106,6 +106,7 @@ public class GPUHist {
       System.out.println("ratio: "+ratio);
 
       verify(resultCPU, resultGPU);
+      //System.out.println("NOT VERIFIED");
     }
   }
 

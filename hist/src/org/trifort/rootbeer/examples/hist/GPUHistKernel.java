@@ -5,10 +5,10 @@ import org.trifort.rootbeer.runtime.RootbeerGpu;
 
 public class GPUHistKernel implements Kernel {
 
-  private byte[][] inputData;
+  private int[][] inputData;
   private int[][] outputData;
 
-  public GPUHistKernel(byte[][] inputData, int[][] outputData){
+  public GPUHistKernel(int[][] inputData, int[][] outputData){
     this.inputData = inputData;
     this.outputData = outputData;
   }
@@ -50,7 +50,7 @@ public class GPUHistKernel implements Kernel {
       //[1  : 0] <== [5  : 4]
       ((thread_idxx &    48) >> 4);
 
-    int end_position = GPUHistConstants.BLOCK_MEMORY / 4;
+    int end_position = GPUHistConstants.BLOCK_MEMORY;
     for(int pos = thread_idxx; pos < end_position;  pos += block_dimx){
       RootbeerGpu.setSharedByte(pos, (byte) 0);
     }
@@ -66,11 +66,11 @@ public class GPUHistKernel implements Kernel {
 
     //read the handle from the field into a register because it is used
     //repeatedly in a loop
-    byte[] localInputData = inputData[block_idxx];
+    int[] localInputData = inputData[block_idxx];
     int[] localOutputData = outputData[block_idxx];
 
-    for(int pos = thread_idxx; pos < GPUHistConstants.DATA_SIZE; pos += block_dimx){
-      byte data4 = localInputData[baseIndex + pos];
+    for(int pos = thread_idxx; pos < dataSize; pos += block_dimx){
+      int data4 = localInputData[pos];
       addData64(threadPos, (data4 >>  2) & 0x3F);
       addData64(threadPos, (data4 >> 10) & 0x3F);
       addData64(threadPos, (data4 >> 18) & 0x3F);
