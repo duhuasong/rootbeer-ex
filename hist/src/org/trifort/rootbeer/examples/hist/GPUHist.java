@@ -56,8 +56,8 @@ public class GPUHist {
 
   public void run(){
     int size = GPUHistConstants.THREAD_N;
-    int numSMs = 2;
-    int blocksPerSM = 2;
+    int numSMs = 14;
+    int blocksPerSM = 32;
     int blockSize = numSMs * blocksPerSM;
     byte[][] input = new byte[blockSize][];
     for(int i = 0; i < blockSize; ++i){
