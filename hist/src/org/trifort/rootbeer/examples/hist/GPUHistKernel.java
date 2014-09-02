@@ -23,9 +23,9 @@ public class GPUHistKernel implements Kernel {
 
   private void addData64(int threadPos, int data){
     int index = threadPos + (data * GPUHistConstants.THREAD_N);
-    byte value = RootbeerGpu.getSharedByte(index);
+    int value = RootbeerGpu.getSharedInteger(index * GPUHistConstants.INT_SIZE);
     ++value;
-    RootbeerGpu.setSharedByte(index, value);
+    RootbeerGpu.setSharedInteger(index * GPUHistConstants.INT_SIZE, value);
   }
 
   public void gpuMethod(){
@@ -52,7 +52,7 @@ public class GPUHistKernel implements Kernel {
 
     int end_position = GPUHistConstants.BLOCK_MEMORY;
     for(int pos = thread_idxx; pos < end_position;  pos += block_dimx){
-      RootbeerGpu.setSharedByte(pos, (byte) 0);
+      RootbeerGpu.setSharedInteger(pos * GPUHistConstants.INT_SIZE, (byte) 0);
     }
 
     RootbeerGpu.syncthreads();
@@ -94,7 +94,7 @@ public class GPUHistKernel implements Kernel {
 
       //Threads with non-zero start positions wrap around the THREAD_N border
       for(int i = 0, accumPos = startPos; i < GPUHistConstants.THREAD_N; i++){
-        sum += RootbeerGpu.getSharedByte(valueBase + accumPos);
+        sum += RootbeerGpu.getSharedInteger((valueBase + accumPos) * GPUHistConstants.INT_SIZE);
         if(++accumPos == GPUHistConstants.THREAD_N) {
           accumPos = 0;
         }
