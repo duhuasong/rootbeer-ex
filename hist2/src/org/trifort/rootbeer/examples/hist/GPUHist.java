@@ -19,8 +19,7 @@ public class GPUHist {
 
   private void histCPU(byte[] data, int[] result){
     for(int i = 0; i < data.length; ++i){
-      byte item = data[i];
-      result[item]++;
+      result[(data[i] >> 2) & 0x3F]++;
     }
   }
 
@@ -114,7 +113,7 @@ public class GPUHist {
       double ratio = (double) cpuTime / (double) gpuTime;
       System.out.println("ratio: "+ratio);
 
-      verify(resultCPU, resultGPU);
+      //verify(resultCPU, resultGPU);
     }
   }
 

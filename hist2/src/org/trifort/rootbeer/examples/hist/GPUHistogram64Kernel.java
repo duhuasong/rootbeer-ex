@@ -31,13 +31,21 @@ public class GPUHistogram64Kernel implements Kernel {
     return a * b;
   }
 
+  private void addByte(int threadBase, byte data){
+    int index = (data >>  2) & 0x3F;
+    int umulIndex = umul(index, GPUHistConstants.HISTOGRAM64_THREADBLOCK_SIZE);
+    byte histValue = RootbeerGpu.getSharedByte(umulIndex);
+    ++histValue;
+    RootbeerGpu.setSharedByte(umulIndex, histValue);
+  }
+
   public void gpuMethod(){
     int threadIdxx = RootbeerGpu.getThreadIdxx();
     int blockIdxx = RootbeerGpu.getBlockIdxx();
     int blockDimx = RootbeerGpu.getBlockDimx();
     int gridDimx = (int) RootbeerGpu.getGridDimx();
 
-    int threadPox =
+    int threadPos =
         ((threadIdxx & ~(GPUHistConstants.SHARED_MEMORY_BANKS * 4 - 1)) << 0) |
         ((threadIdxx & (GPUHistConstants.SHARED_MEMORY_BANKS     - 1)) << 2) |
         ((threadIdxx & (GPUHistConstants.SHARED_MEMORY_BANKS * 3)) >> 4);
@@ -62,12 +70,10 @@ public class GPUHistogram64Kernel implements Kernel {
     int[] localOutputData = partialHistograms;
 
     for(int pos = startPos; pos < dataCount; pos += incrementer){
-      int prev = RootbeerGpu.getSharedInteger(pos * GPUHistConstants.INT_SIZE);
-      prev += localInputData0[pos];
-      prev += localInputData1[pos];
-      prev += localInputData2[pos];
-      prev += localInputData3[pos];
-      RootbeerGpu.setSharedInteger(pos * GPUHistConstants.INT_SIZE, prev);
+      addByte(threadPos, localInputData0[pos]);
+      addByte(threadPos, localInputData1[pos]);
+      addByte(threadPos, localInputData2[pos]);
+      addByte(threadPos, localInputData3[pos]);
     }
 
     RootbeerGpu.syncthreads();
