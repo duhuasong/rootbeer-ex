@@ -8,6 +8,6 @@ public class GPUHistConstants {
   public static final int THREAD_N = 192;
   public static final int BLOCK_MEMORY = THREAD_N * BIN_COUNT;
   public static final int BLOCK_DATA = THREAD_N * 63;
-  public static final int DATA_N = 96000000 / INT_SIZE / 10;
+  public static final int DATA_N = 96000000 / 100;
 
 }

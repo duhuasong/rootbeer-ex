@@ -5,10 +5,10 @@ import org.trifort.rootbeer.runtime.RootbeerGpu;
 
 public class GPUHistKernel implements Kernel {
 
-  private int[][] inputData;
+  private byte[][] inputData;
   private int[][] outputData;
 
-  public GPUHistKernel(int[][] inputData, int[][] outputData){
+  public GPUHistKernel(byte[][] inputData, int[][] outputData){
     this.inputData = inputData;
     this.outputData = outputData;
   }
@@ -66,15 +66,12 @@ public class GPUHistKernel implements Kernel {
 
     //read the handle from the field into a register because it is used
     //repeatedly in a loop
-    int[] localInputData = inputData[block_idxx];
+    byte[] localInputData = inputData[block_idxx];
     int[] localOutputData = outputData[block_idxx];
 
     for(int pos = thread_idxx; pos < dataSize; pos += block_dimx){
-      int data4 = localInputData[pos];
-      addData64(threadPos, (data4 >>  2) & 0x3F);
-      addData64(threadPos, (data4 >> 10) & 0x3F);
-      addData64(threadPos, (data4 >> 18) & 0x3F);
-      addData64(threadPos, (data4 >> 26) & 0x3F);
+      byte item = localInputData[pos];
+      addData64(threadPos, (item >>  2) & 0x3F);
     }
 
     RootbeerGpu.syncthreads();
