@@ -21,13 +21,9 @@ public class GPUHist {
   }
 
   private int[] newArray(int size){
-    int seed = 2009;
-    int prev = lcg(seed);
     int[] ret = new int[size];
     for(int i = 0; i < size; ++i){
-      int next = lcg(prev);
-      ret[i] = prev % 256;
-      prev = next;
+      ret[i] = i;
     }
     return ret;
   }
