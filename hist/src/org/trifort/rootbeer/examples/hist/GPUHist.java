@@ -16,10 +16,18 @@ public class GPUHist {
 
   }
 
+  private int lcg(int prev){
+    return ((1103515245 * prev) + 12345) % 2147483646;
+  }
+
   private int[] newArray(int size){
+    int seed = 2009;
+    int prev = lcg(seed);
     int[] ret = new int[size];
     for(int i = 0; i < size; ++i){
-      ret[i] = i;
+      int next = lcg(prev);
+      ret[i] = prev % 256;
+      prev = next;
     }
     return ret;
   }
@@ -74,6 +82,9 @@ public class GPUHist {
     context0.setThreadConfig(size, blockSize, blockSize * size);
     context0.setKernel(new GPUHistKernel(input, resultGPU));
     context0.buildState();
+
+    histCPU(input[0], resultCPU[0]);
+    System.out.println("resultCPU[0][0]: "+resultCPU[0][0]);
 
     while(true){
       for(int i = 0; i < blockSize; ++i){
