@@ -79,11 +79,14 @@ public class GPUHist {
 
   public void run(){
     int size = GPUHistConstants.THREAD_N;
-    int blockSize = iDivUp(GPUHistConstants.DATA_N / 4, GPUHistConstants.THREAD_N * 63);
+    int blockSize = iDivUp(GPUHistConstants.DATA_N, GPUHistConstants.THREAD_N * 63);
     if(blockSize > GPUHistConstants.MAX_BLOCK_N){
       System.out.println("histogram64gpu(): data size exceeds maximum");
       return;
     }
+
+    System.out.println("threadSize: "+size);
+    System.out.println("blockSize: "+blockSize);
 
     int[] input = newArray(GPUHistConstants.DATA_N);
     int[] resultGPU = new int[GPUHistConstants.BIN_COUNT];

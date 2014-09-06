@@ -21,8 +21,12 @@ public class GPUHistKernel implements Kernel {
     }
   }
 
+  private int mul24(int a, int b){
+    return (a & 0xFFFFFF) * (b & 0xFFFFFF);
+  }
+
   private void addData64(int threadPos, int data){
-    int index = threadPos + (data * GPUHistConstants.THREAD_N);
+    int index = threadPos + mul24(data, GPUHistConstants.THREAD_N);
     short value = RootbeerGpu.getSharedShort(index * GPUHistConstants.SHORT_SIZE);
     ++value;
     RootbeerGpu.setSharedShort(index * GPUHistConstants.SHORT_SIZE, value);
@@ -37,7 +41,7 @@ public class GPUHistKernel implements Kernel {
     int thread_idxx = RootbeerGpu.getThreadIdxx();
 
     //Global base index in input data for current block
-    int baseIndex = GPUHistConstants.BLOCK_DATA * block_idxx;
+    int baseIndex = mul24(GPUHistConstants.BLOCK_DATA, block_idxx);
 
     //Current block size, clamp by array border
     int dataSize = min(GPUHistConstants.DATA_N - baseIndex, GPUHistConstants.BLOCK_DATA);
@@ -86,7 +90,6 @@ public class GPUHistKernel implements Kernel {
     }
 
     RootbeerGpu.syncthreads();
-    RootbeerGpu.threadfenceBlock();
 
     ////////////////////////////////////////////////////////////////////////////
     // Merge per-thread histograms into per-block and write to global memory.
@@ -99,15 +102,16 @@ public class GPUHistKernel implements Kernel {
       int sum = 0;
       int value = thread_idxx;
 
-      int valueBase = value * GPUHistConstants.THREAD_N;
-      int startPos = (thread_idxx & 15) * 4;
+      int valueBase = mul24(value, GPUHistConstants.THREAD_N);
+      int startPos = mul24(thread_idxx & 15, 4);
       //int startPos = (thread_idxx & 15);
 
       //Threads with non-zero start positions wrap around the THREAD_N border
       int sharedIndex = 0;
       for(int i = 0, accumPos = startPos; i < GPUHistConstants.THREAD_N; i++){
         int rawIndex = (valueBase + accumPos);
-        short sharedValue = RootbeerGpu.getSharedShort(rawIndex * GPUHistConstants.SHORT_SIZE);
+        int shortIndex = rawIndex * GPUHistConstants.SHORT_SIZE;
+        short sharedValue = RootbeerGpu.getSharedShort(shortIndex);
         sum += sharedValue;
         //if(thread_idxx == 0){
         //  System.out.println(sharedIndex+" "+sharedValue+" "+rawIndex);
