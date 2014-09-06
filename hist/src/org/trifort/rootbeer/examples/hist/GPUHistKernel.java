@@ -5,10 +5,10 @@ import org.trifort.rootbeer.runtime.RootbeerGpu;
 
 public class GPUHistKernel implements Kernel {
 
-  private int[][] inputData;
-  private int[][] outputData;
+  private int[] inputData;
+  private int[] outputData;
 
-  public GPUHistKernel(int[][] inputData, int[][] outputData){
+  public GPUHistKernel(int[] inputData, int[] outputData){
     this.inputData = inputData;
     this.outputData = outputData;
   }
@@ -26,6 +26,9 @@ public class GPUHistKernel implements Kernel {
     short value = RootbeerGpu.getSharedShort(index * GPUHistConstants.SHORT_SIZE);
     ++value;
     RootbeerGpu.setSharedShort(index * GPUHistConstants.SHORT_SIZE, value);
+    //if(index == 1){
+    //  System.out.println("i1: "+value);
+    //}
   }
 
   public void gpuMethod(){
@@ -39,10 +42,10 @@ public class GPUHistKernel implements Kernel {
     //Current block size, clamp by array border
     int dataSize = min(GPUHistConstants.DATA_N - baseIndex, GPUHistConstants.BLOCK_DATA);
 
-    if(thread_idxx == 0){
-      System.out.println("baseIndex: "+baseIndex);
-      System.out.println("dataSize: "+dataSize);
-    }
+    //if(thread_idxx == 0){
+    //  System.out.println("baseIndex: "+baseIndex);
+    //  System.out.println("dataSize: "+dataSize);
+    //}
 
     //Encode thread index in order to avoid bank conflicts in s_Hist[] access:
     //each half-warp accesses consecutive shared memory banks
@@ -71,8 +74,8 @@ public class GPUHistKernel implements Kernel {
 
     //read the handle from the field into a register because it is used
     //repeatedly in a loop
-    int[] localInputData = inputData[block_idxx];
-    int[] localOutputData = outputData[block_idxx];
+    int[] localInputData = inputData;
+    int[] localOutputData = outputData;
 
     for(int pos = thread_idxx; pos < dataSize; pos += block_dimx){
       int item = localInputData[pos];
@@ -83,6 +86,7 @@ public class GPUHistKernel implements Kernel {
     }
 
     RootbeerGpu.syncthreads();
+    RootbeerGpu.threadfenceBlock();
 
     ////////////////////////////////////////////////////////////////////////////
     // Merge per-thread histograms into per-block and write to global memory.
@@ -105,11 +109,6 @@ public class GPUHistKernel implements Kernel {
         int rawIndex = (valueBase + accumPos);
         short sharedValue = RootbeerGpu.getSharedShort(rawIndex * GPUHistConstants.SHORT_SIZE);
         sum += sharedValue;
-        if(sharedIndex == 0){
-          synchronized(this){
-            System.out.println(sharedValue);
-          }
-        }
         //if(thread_idxx == 0){
         //  System.out.println(sharedIndex+" "+sharedValue+" "+rawIndex);
         //  ++sharedIndex;

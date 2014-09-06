@@ -38,7 +38,20 @@ public class GPUHist {
     }
   }
 
-  private void verify(int[][] resultCPU, int[][] resultGPU){
+  private void verify(int[] resultCPU, int[] resultGPU){
+    for(int i = 0; i < resultCPU.length; ++i){
+      int cpu_value = resultCPU[i];
+      int gpu_value = resultGPU[i];
+
+      if(cpu_value != gpu_value){
+        System.out.println("VERIFY FAILED");
+        System.out.println("cpu_value: "+cpu_value);
+        System.out.println("gpu_value: "+gpu_value);
+        System.out.println("i: "+i);
+        return;
+      }
+    }
+    /*
     for(int i = 0; i < resultCPU.length; ++i){
       int[] subCPU = resultCPU[i];
       int[] subGPU = resultGPU[i];
@@ -55,6 +68,7 @@ public class GPUHist {
         }
       }
     }
+    */
     System.out.println("VERIFY PASSED");
   }
 
@@ -65,19 +79,15 @@ public class GPUHist {
 
   public void run(){
     int size = GPUHistConstants.THREAD_N;
-    //int blockSize = iDivUp(GPUHistConstants.DATA_N / 4, GPUHistConstants.THREAD_N * 63);
-    int blockSize = 1;
+    int blockSize = iDivUp(GPUHistConstants.DATA_N / 4, GPUHistConstants.THREAD_N * 63);
     if(blockSize > GPUHistConstants.MAX_BLOCK_N){
       System.out.println("histogram64gpu(): data size exceeds maximum");
       return;
     }
 
-    int[][] input = new int[blockSize][];
-    for(int i = 0; i < blockSize; ++i){
-      input[i] = newArray(GPUHistConstants.DATA_N);
-    }
-    int[][] resultGPU = new int[blockSize][GPUHistConstants.BIN_COUNT];
-    int[][] resultCPU = new int[blockSize][GPUHistConstants.BIN_COUNT];
+    int[] input = newArray(GPUHistConstants.DATA_N);
+    int[] resultGPU = new int[GPUHistConstants.BIN_COUNT];
+    int[] resultCPU = new int[GPUHistConstants.BIN_COUNT];
 
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
@@ -88,15 +98,13 @@ public class GPUHist {
     context0.setKernel(new GPUHistKernel(input, resultGPU));
     context0.buildState();
 
-    histCPU(input[0], resultCPU[0]);
-    System.out.println("resultCPU[0][0]: "+resultCPU[0][0]);
+    histCPU(input, resultCPU);
+    System.out.println("resultCPU[0]: "+resultCPU[0]);
 
     while(true){
-      for(int i = 0; i < blockSize; ++i){
-        for(int j = 0; j < GPUHistConstants.BIN_COUNT; ++j){
-          resultGPU[i][j] = 0;
-          resultCPU[i][j] = 0;
-        }
+      for(int i = 0; i < GPUHistConstants.BIN_COUNT; ++i){
+        resultGPU[i] = 0;
+        resultCPU[i] = 0;
       }
 
       long gpuStart = System.currentTimeMillis();
@@ -112,9 +120,7 @@ public class GPUHist {
       System.out.println("gpu_time: "+gpuTime);
 
       long cpuStart = System.currentTimeMillis();
-      for(int i = 0; i < blockSize; ++i){
-        histCPU(input[i], resultCPU[i]);
-      }
+      histCPU(input, resultCPU);
       long cpuStop = System.currentTimeMillis();
       long cpuTime = cpuStop - cpuStart;
       System.out.println("cpu_time: "+cpuTime);
