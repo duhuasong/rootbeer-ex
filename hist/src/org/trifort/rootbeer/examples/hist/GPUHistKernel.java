@@ -30,9 +30,6 @@ public class GPUHistKernel implements Kernel {
     short value = RootbeerGpu.getSharedShort(index * GPUHistConstants.SHORT_SIZE);
     ++value;
     RootbeerGpu.setSharedShort(index * GPUHistConstants.SHORT_SIZE, value);
-    //if(index == 1){
-    //  System.out.println("i1: "+value);
-    //}
   }
 
   public void gpuMethod(){
@@ -45,11 +42,6 @@ public class GPUHistKernel implements Kernel {
 
     //Current block size, clamp by array border
     int dataSize = min(GPUHistConstants.DATA_N - baseIndex, GPUHistConstants.BLOCK_DATA);
-
-    //if(thread_idxx == 0){
-    //  System.out.println("baseIndex: "+baseIndex);
-    //  System.out.println("dataSize: "+dataSize);
-    //}
 
     //Encode thread index in order to avoid bank conflicts in s_Hist[] access:
     //each half-warp accesses consecutive shared memory banks
@@ -104,7 +96,6 @@ public class GPUHistKernel implements Kernel {
 
       int valueBase = mul24(value, GPUHistConstants.THREAD_N);
       int startPos = mul24(thread_idxx & 15, 4);
-      //int startPos = (thread_idxx & 15);
 
       //Threads with non-zero start positions wrap around the THREAD_N border
       int sharedIndex = 0;
@@ -113,10 +104,6 @@ public class GPUHistKernel implements Kernel {
         int shortIndex = rawIndex * GPUHistConstants.SHORT_SIZE;
         short sharedValue = RootbeerGpu.getSharedShort(shortIndex);
         sum += sharedValue;
-        //if(thread_idxx == 0){
-        //  System.out.println(sharedIndex+" "+sharedValue+" "+rawIndex);
-        //  ++sharedIndex;
-        //}
         if(++accumPos == GPUHistConstants.THREAD_N) {
           accumPos = 0;
         }

@@ -51,24 +51,6 @@ public class GPUHist {
         return;
       }
     }
-    /*
-    for(int i = 0; i < resultCPU.length; ++i){
-      int[] subCPU = resultCPU[i];
-      int[] subGPU = resultGPU[i];
-      for(int j = 0; j < subCPU.length; ++j){
-        int cpu_value = subCPU[j];
-        int gpu_value = subGPU[j];
-
-        if(cpu_value != gpu_value){
-          System.out.println("VERIFY FAILED");
-          System.out.println("cpu_value: "+cpu_value);
-          System.out.println("gpu_value: "+gpu_value);
-          System.out.println("i: "+i+" j: "+j);
-          return;
-        }
-      }
-    }
-    */
     System.out.println("VERIFY PASSED");
   }
 
@@ -95,7 +77,7 @@ public class GPUHist {
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
     GpuDevice device0 = devices.get(0);
-    Context context0 = device0.createContext();
+    Context context0 = device0.createContext(96000432);
     context0.setCacheConfig(CacheConfig.PREFER_SHARED);
     context0.setThreadConfig(size, blockSize, blockSize * size);
     context0.setKernel(new GPUHistKernel(input, resultGPU));
