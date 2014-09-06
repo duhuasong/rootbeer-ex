@@ -5,10 +5,10 @@ import org.trifort.rootbeer.runtime.RootbeerGpu;
 
 public class GPUHistKernel implements Kernel {
 
-  private byte[][] inputData;
+  private int[][] inputData;
   private int[][] outputData;
 
-  public GPUHistKernel(byte[][] inputData, int[][] outputData){
+  public GPUHistKernel(int[][] inputData, int[][] outputData){
     this.inputData = inputData;
     this.outputData = outputData;
   }
@@ -23,9 +23,9 @@ public class GPUHistKernel implements Kernel {
 
   private void addData64(int threadPos, int data){
     int index = threadPos + (data * GPUHistConstants.THREAD_N);
-    int value = RootbeerGpu.getSharedInteger(index * GPUHistConstants.INT_SIZE);
+    byte value = RootbeerGpu.getSharedByte(index);
     ++value;
-    RootbeerGpu.setSharedInteger(index * GPUHistConstants.INT_SIZE, value);
+    RootbeerGpu.setSharedByte(index, value);
   }
 
   public void gpuMethod(){
@@ -38,6 +38,11 @@ public class GPUHistKernel implements Kernel {
 
     //Current block size, clamp by array border
     int dataSize = min(GPUHistConstants.DATA_N - baseIndex, GPUHistConstants.BLOCK_DATA);
+
+    if(thread_idxx == 0){
+      System.out.println("baseIndex: "+baseIndex);
+      System.out.println("dataSize: "+dataSize);
+    }
 
     //Encode thread index in order to avoid bank conflicts in s_Hist[] access:
     //each half-warp accesses consecutive shared memory banks
@@ -52,7 +57,7 @@ public class GPUHistKernel implements Kernel {
 
     int end_position = GPUHistConstants.BLOCK_MEMORY;
     for(int pos = thread_idxx; pos < end_position;  pos += block_dimx){
-      RootbeerGpu.setSharedInteger(pos * GPUHistConstants.INT_SIZE, (byte) 0);
+      RootbeerGpu.setSharedInteger(pos * GPUHistConstants.INT_SIZE, 0);
     }
 
     RootbeerGpu.syncthreads();
@@ -66,12 +71,15 @@ public class GPUHistKernel implements Kernel {
 
     //read the handle from the field into a register because it is used
     //repeatedly in a loop
-    byte[] localInputData = inputData[block_idxx];
+    int[] localInputData = inputData[block_idxx];
     int[] localOutputData = outputData[block_idxx];
 
     for(int pos = thread_idxx; pos < dataSize; pos += block_dimx){
-      byte item = localInputData[pos];
+      int item = localInputData[pos];
       addData64(threadPos, (item >>  2) & 0x3F);
+      addData64(threadPos, (item >> 10) & 0x3F);
+      addData64(threadPos, (item >> 18) & 0x3F);
+      addData64(threadPos, (item >> 26) & 0x3F);
     }
 
     RootbeerGpu.syncthreads();
@@ -83,15 +91,23 @@ public class GPUHistKernel implements Kernel {
     // See supplied whitepaper for detailed explanations.
     ////////////////////////////////////////////////////////////////////////////
     if(thread_idxx < GPUHistConstants.BIN_COUNT){
+      //64 threads here
       int sum = 0;
       int value = thread_idxx;
 
       int valueBase = value * GPUHistConstants.THREAD_N;
       int startPos = (thread_idxx & 15) * 4;
+      //int startPos = (thread_idxx & 15);
 
       //Threads with non-zero start positions wrap around the THREAD_N border
+      int sharedIndex = 0;
       for(int i = 0, accumPos = startPos; i < GPUHistConstants.THREAD_N; i++){
-        sum += RootbeerGpu.getSharedInteger((valueBase + accumPos) * GPUHistConstants.INT_SIZE);
+        byte sharedValue = RootbeerGpu.getSharedByte(valueBase + accumPos);
+        sum += sharedValue;
+        if(thread_idxx == 0){
+          System.out.println("index: "+sharedIndex+" value: "+sharedValue);
+          ++sharedIndex;
+        }
         if(++accumPos == GPUHistConstants.THREAD_N) {
           accumPos = 0;
         }

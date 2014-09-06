@@ -16,18 +16,25 @@ public class GPUHist {
 
   }
 
-  private byte[] newArray(int size){
-    byte[] ret = new byte[size];
-    for(int i = 0; i < size; ++i){
-      ret[i] = (byte) (i & 0x1f);
+  private int[] newArray(int size){
+    int[] ret = new int[size];
+    for(int i = 0; i < size*4; i += 4){
+      int intValue = (i & 0x3f) |
+                     (((i + 1) & 0x3f) << 8) |
+                     (((i + 2) & 0x3f) << 16) |
+                     (((i + 3) & 0x3f) << 24);
+      ret[i/4] = intValue;
     }
     return ret;
   }
 
-  private void histCPU(byte[] data, int[] result){
-    for(int i = 0; i < GPUHistConstants.DATA_N; ++i){
-      byte item = data[i];
-      result[(item >> 2) & 0x3F]++;
+  private void histCPU(int[] data, int[] result){
+    for(int i = 0; i < data.length; ++i){
+      int item = data[i];
+      result[(item >>  2) & 0x3F]++;
+      result[(item >> 10) & 0x3F]++;
+      result[(item >> 18) & 0x3F]++;
+      result[(item >> 26) & 0x3F]++;
     }
   }
 
@@ -51,12 +58,21 @@ public class GPUHist {
     System.out.println("VERIFY PASSED");
   }
 
+  //Round a / b to nearest higher integer value
+  private int iDivUp(int a, int b){
+    return (a % b != 0) ? (a / b + 1) : (a / b);
+  }
+
   public void run(){
     int size = GPUHistConstants.THREAD_N;
-    int numSMs = 2;
-    int blocksPerSM = 2;
-    int blockSize = numSMs * blocksPerSM;
-    byte[][] input = new byte[blockSize][];
+    //int blockSize = iDivUp(GPUHistConstants.DATA_N / 4, GPUHistConstants.THREAD_N * 63);
+    int blockSize = 1;
+    if(blockSize > GPUHistConstants.MAX_BLOCK_N){
+      System.out.println("histogram64gpu(): data size exceeds maximum");
+      return;
+    }
+
+    int[][] input = new int[blockSize][];
     for(int i = 0; i < blockSize; ++i){
       input[i] = newArray(GPUHistConstants.DATA_N);
     }
