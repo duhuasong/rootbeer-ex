@@ -99,7 +99,10 @@ public class GPUHist {
 
       StatsRow row0 = context0.getStats();
       System.out.println("serialization_time: "+row0.getSerializationTime());
-      System.out.println("execution_time: "+row0.getExecutionTime());
+      System.out.println("driver_memcopy_to_device_time: "+row0.getDriverMemcopyToDeviceTime());
+      System.out.println("driver_execution_time: "+row0.getDriverExecTime());
+      System.out.println("driver_memcopy_from_device_time: "+row0.getDriverMemcopyFromDeviceTime());
+      System.out.println("total_driver_execution_time: "+row0.getTotalDriverExecutionTime());
       System.out.println("deserialization_time: "+row0.getDeserializationTime());
       System.out.println("gpu_required_memory: "+context0.getRequiredMemory());
       System.out.println("gpu_time: "+gpuTime);
