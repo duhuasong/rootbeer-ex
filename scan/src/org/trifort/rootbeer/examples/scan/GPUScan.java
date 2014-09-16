@@ -16,25 +16,25 @@ public class GPUScan {
 
   }
 
-  private int[] newArray(int size){
-    int[] ret = new int[size];
+  private float[] newArray(int size){
+    float[] ret = new float[size];
     for(int i = 0; i < size; ++i){
       ret[i] = i;
     }
     return ret;
   }
 
-  private void scanCPU(int[] inputData, int[] outputData){
+  private void scanCPU(float[] inputData, float[] outputData){
     outputData[0] = 0;
     for(int k = 1; k < inputData.length; ++k){
       outputData[k] = inputData[k-1] + outputData[k-1];
     }
   }
 
-  private void verify(int[] resultCPU, int[] resultGPU){
+  private void verify(float[] resultCPU, float[] resultGPU){
     for(int i = 0; i < resultCPU.length; ++i){
-      int cpu_value = resultCPU[i];
-      int gpu_value = resultGPU[i];
+      float cpu_value = resultCPU[i];
+      float gpu_value = resultGPU[i];
 
       if(cpu_value != gpu_value){
         System.out.println("VERIFY FAILED");
@@ -54,20 +54,20 @@ public class GPUScan {
     System.out.println("threadSize: "+threadSize);
     System.out.println("blockSize: "+blockSize);
 
-    int[][] input = new int[blockSize][];
-    int[][] resultGPU = new int[blockSize][];
-    int[][] resultCPU = new int[blockSize][];
+    float[][] input = new float[blockSize][];
+    float[][] resultGPU = new float[blockSize][];
+    float[][] resultCPU = new float[blockSize][];
 
     for(int i = 0; i < blockSize; ++i){
       input[i] = newArray(GPUScanConstants.DATA_N);
-      resultGPU[i] = new int[GPUScanConstants.DATA_N];
-      resultCPU[i] = new int[GPUScanConstants.DATA_N];
+      resultGPU[i] = new float[GPUScanConstants.DATA_N];
+      resultCPU[i] = new float[GPUScanConstants.DATA_N];
     }
 
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
     GpuDevice device0 = devices.get(0);
-    Context context0 = device0.createContext(67698864);
+    Context context0 = device0.createContext(134807728);
     context0.setCacheConfig(CacheConfig.PREFER_SHARED);
     context0.setThreadConfig(threadSize, blockSize, threadSize * blockSize);
     context0.setKernel(new GPUScanKernel(input, resultGPU));
@@ -112,9 +112,9 @@ public class GPUScan {
     }
   }
 
-  private void printArray(String header, int[] array){
+  private void printArray(String header, float[] array){
     System.out.println("printArray: "+header);
-    for(int value : array){
+    for(float value : array){
       System.out.print(value+" ");
     }
   }
