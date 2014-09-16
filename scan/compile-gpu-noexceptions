@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp ~/code/rootbeer1/Rootbeer.jar lib/Rootbeer.jar
+java -jar lib/Rootbeer.jar dist/scan.jar dist/scan-gpu.jar -64bit -noexceptions -shared-mem-size 49152
