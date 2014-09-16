@@ -7,9 +7,9 @@
     <javac srcdir="src" destdir="build/classes" classpath="lib/Rootbeer.jar" />
   </target>
   <target name="jar" depends="compile">
-    <jar destfile="sorter.jar" basedir="build/classes">
+    <jar destfile="dist/pagerank.jar" basedir="build/classes">
       <manifest>
-        <attribute name="Main-Class" value="org.trifort.rootbeer.sort.GPUSort"/>
+        <attribute name="Main-Class" value="PageRankApp"/>
       </manifest>
     </jar>
   </target>

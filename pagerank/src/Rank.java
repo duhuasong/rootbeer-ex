@@ -1,3 +1,5 @@
+import org.trifort.rootbeer.runtime.Kernel;
+
 public class Rank implements Kernel
 {
     int[] linksColumn;

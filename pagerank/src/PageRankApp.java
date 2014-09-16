@@ -1,3 +1,11 @@
+import org.trifort.rootbeer.runtime.Kernel;
+import org.trifort.rootbeer.runtime.Rootbeer;
+import org.trifort.rootbeer.runtime.Context;
+import org.trifort.rootbeer.runtime.StatsRow;
+
+import java.util.List;
+import java.util.ArrayList;
+
 public class PageRankApp {
 
 
@@ -23,28 +31,16 @@ public class PageRankApp {
             jobs.add(new Rank(transpose[i], linksPerRow, ranks, i));
 
         Rootbeer rootbeer = new Rootbeer();
-        Context context = rootbeer.createDefaultContext();
-
         double time = System.currentTimeMillis();
 
-        for (int i = 0; i < iterations; ++i)
-            rootbeer.run(jobs, context);
+        for (int i = 0; i < iterations; ++i){
+          rootbeer.run(jobs);
+        }
 
         //((Rank)jobs.get(0)).displayRanks();
 
         System.out.println(System.currentTimeMillis() - time + "ms elapsed");
-        List<StatsRow> stats = context.getStats();
-        double serialTime = 0, execTime = 0, deserialTime = 0;
-        for (StatsRow row : stats)
-        {
-            serialTime += row.getSerializationTime();
-            execTime += row.getExecutionTime();
-            deserialTime += row.getDeserializationTime();
-        }
         System.out.println("Stats, aggregate across " + iterations + " (de)serialization cycles on a " + dim + " node system:");
-        System.out.println("\tserial time: " + serialTime);
-        System.out.println("\texec time: " + execTime);
-        System.out.println("\tdeserial time: " + deserialTime);
     }
 
     public static int[][] transpose(int[][] links)
