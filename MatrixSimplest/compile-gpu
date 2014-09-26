@@ -1,0 +1,4 @@
+#!/bin/sh
+
+ant jar
+java -jar lib/Rootbeer.jar MatrixApp.jar MatrixApp-GPU.jar -64bit
