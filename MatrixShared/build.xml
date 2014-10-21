@@ -4,7 +4,7 @@
     </target>
     <target name="compile">
         <mkdir dir="build/classes"/>
-        <javac srcdir="src" destdir="build/classes" classpath="lib/Rootbeer.jar" />
+        <javac srcdir="src" destdir="build/classes" classpath="../lib/Rootbeer.jar" />
     </target>
     <target name="jar" depends="compile">
         <jar destfile="MatrixApp.jar" basedir="build/classes">
