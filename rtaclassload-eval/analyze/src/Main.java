@@ -22,7 +22,8 @@ public class Main {
     Options.v().set_process_dir(procesDirectory);
     RTAClassLoader.v().addApplicationJar(jarPath);
 
-    RTAClassLoader.v().addEntryMethodTester(new MainEntryMethodTester());
+    RTAClassLoader.v().addEntryMethodTester(new MainEntryMethodTester("com.installshield.wizard.platform.legacyhpux.service.registry.LegacyHpuxSoftObj"));
+    RTAClassLoader.v().addEntryMethodTester(new MainEntryMethodTester("A"));
     RTAClassLoader.v().loadNecessaryClasses();
     long stopTime = System.currentTimeMillis();
     long totalTime = stopTime - startTime;
