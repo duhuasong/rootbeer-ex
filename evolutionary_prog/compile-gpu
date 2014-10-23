@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp ~/code/rootbeer1/Rootbeer.jar lib/Rootbeer.jar
+java -jar lib/Rootbeer.jar dist/evol-prog.jar dist/evol-prog-gpu.jar -64bit -noexceptions -noarraychecks -shared-mem-size 49152
