@@ -91,7 +91,7 @@ public class Main {
     if(localFile.exists()){
       hmm = openHmm(localFilename);
     } else {
-      String remoteFilename = "http://trifort.org/hmm/"+localFilename;
+      String remoteFilename = "http://trifort.org/hmm-gpu/"+localFilename;
       if(remoteFileExists(remoteFilename)){
         downloadFile(remoteFilename, localFilename);
         hmm = openHmm(localFilename);
@@ -139,7 +139,7 @@ public class Main {
   }
 
   private boolean parseArgs(String[] args){
-    if(args.length != 0){
+    if(args.length != 1){
       showUsage();
     } else {
       String arg0 = args[0];
