@@ -2,4 +2,4 @@
 
 ant clean
 ant jar
-java -jar ../lib/Rootbeer.jar MatrixApp.jar MatrixApp-GPU.jar -maxrregcount 32 -64bit -noexceptions -noarraychecks
+java -jar ../lib/Rootbeer.jar dist/MatrixApp.jar dist/MatrixApp-GPU.jar -maxrregcount 32 -64bit -noexceptions -noarraychecks

@@ -4,12 +4,12 @@
   </target>
   <target name="compile">
     <mkdir dir="build/classes"/>
-    <javac srcdir="src" destdir="build/classes" classpath="lib/Rootbeer.jar" />
+    <javac srcdir="src" destdir="build/classes" classpath="lib/Rootbeer.jar:lib/commons-io-2.4.jar:lib/jahmm-0.6.1.jar" />
   </target>
   <target name="jar" depends="compile">
-    <jar destfile="dist/hist.jar" basedir="build/classes">
+    <jar destfile="dist/hmm.jar" basedir="build/classes">
       <manifest>
-        <attribute name="Main-Class" value="org.trifort.rootbeer.examples.hist.GPUHist"/>
+        <attribute name="Main-Class" value="org.trifort.rootbeer.examples.hmm.Main"/>
       </manifest>
     </jar>
   </target>
