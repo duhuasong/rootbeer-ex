@@ -20,10 +20,8 @@ public class ForwardBackwardScaledGpuInt {
   private float prob;
   private boolean usingScaling;
 
-  public ForwardBackwardScaledGpuInt(int[] oseq, HmmGpuInt hmm){
-
+  public ForwardBackwardScaledGpuInt(int[] oseq, HmmGpuInt hmm, boolean useGpu){
     usingScaling = true;
-    boolean useGpu = false;
     if(useGpu){
       computeGPU(hmm, oseq);
     } else {

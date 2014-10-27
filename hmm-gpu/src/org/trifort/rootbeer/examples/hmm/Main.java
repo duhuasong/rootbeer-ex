@@ -14,6 +14,11 @@ import java.io.File;
 import org.apache.commons.io.IOUtils;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+
+import org.trifort.coarsening.storage.Droplet;
+import org.trifort.coarsening.storage.OfCoarseMovie;
+import org.trifort.coarsening.storage.OfCoarseMovieFrame;
 
 public class Main {
 
@@ -111,15 +116,59 @@ public class Main {
 
     if(test1){
       File file1 = movieFiles.get(11);
-      OfCoarseMovie movie = new OfCoarseMovie(file1);
-      List<ObservationInteger> signal1 = movie.getSignal();
+      OfCoarseMovie movie = new OfCoarseMovie();
+      movie.open(file1);
+      List<ObservationInteger> signal1 = createSignal(movie);
 
+      long startTime = System.currentTimeMillis();
       ForwardBackwardScaledGpuInt forwardBackward =
-          new ForwardBackwardScaledGpuInt(convert(signal1), new HmmGpuInt(hmm));
+          new ForwardBackwardScaledGpuInt(convert(signal1), new HmmGpuInt(hmm), true);
       double prob = forwardBackward.probability();
+      long stopTime = System.currentTimeMillis();
+      long time = stopTime - startTime;
+
+      System.out.println("GPU time: "+time);
+      System.out.println("GPU probability: "+prob);
+
+      startTime = System.currentTimeMillis();
+      forwardBackward =
+          new ForwardBackwardScaledGpuInt(convert(signal1), new HmmGpuInt(hmm), false);
+      prob = forwardBackward.probability();
+      stopTime = System.currentTimeMillis();
+      time = stopTime - startTime;
+
+      System.out.println("CPU time: "+time);
+      System.out.println("CPU probability: "+prob);
     } else {
 
     }
+  }
+
+  private List<ObservationInteger> createSignal(OfCoarseMovie movie){
+    List<ObservationInteger> ret = new ArrayList<ObservationInteger>();
+    for(int i = 0; i < movie.size(); ++i){
+      OfCoarseMovieFrame frame = movie.getFrame(i);
+      List<Droplet> frameDrops = frame.getDroplets();
+      ret.addAll(createSignalFrame(frameDrops));
+    }
+    return ret;
+  }
+
+  private List<ObservationInteger> createSignalFrame(List<Droplet> frameDroplets){
+    List<Integer> radii = new ArrayList<Integer>();
+    for(Droplet droplet : frameDroplets){
+      if(droplet.getVolume() < 1){
+        continue;
+      }
+      radii.add((int) droplet.getVolume());
+    }
+
+    Collections.sort(radii);
+    List<ObservationInteger> ret = new ArrayList<ObservationInteger>();
+    for(int radius : radii){
+      ret.add(new ObservationInteger(radius));
+    }
+    return ret;
   }
 
   private int[] convert(List<ObservationInteger> signal){
