@@ -1,0 +1,3 @@
+#!/bin/sh
+
+java -jar pack.jar -mainjar dist/hmm.jar -directory lib -destjar hmm-1.0.jar
