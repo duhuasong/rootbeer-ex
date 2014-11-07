@@ -22,6 +22,13 @@ import org.trifort.coarsening.storage.OfCoarseMovieFrame;
 
 public class Main {
 
+  private int numStates;
+  private int maxValue;
+
+  public Main(){
+    numStates = 8160;
+  }
+
   private Hmm openHmm(String localFilename){
     try {
       FileInputStream stream = new FileInputStream(localFilename);
@@ -34,8 +41,25 @@ public class Main {
     }
   }
 
-  private Hmm createHmm(){
-    return null;
+  private Hmm createHmm(File singleMovieSource){
+    OpdfIntegerFactory opdfFactory = new OpdfIntegerFactory(maxValue+1);
+
+    List<List<ObservationInteger>> fullSignal = new ArrayList<List<ObservationInteger>>();
+    OfCoarseMovie movie0 = new OfCoarseMovie();
+    movie0.open(singleMovieSource);
+    List<ObservationInteger> fullSignal0 = createSignal(movie0);
+    fullSignal.add(fullSignal0);
+
+    long startTime = System.currentTimeMillis();
+    KMeansLearner<ObservationInteger> learner =
+      new KMeansLearner<ObservationInteger>(numStates, opdfFactory, fullSignal);
+    Hmm hmm = learner.learn();
+    long stopTime = System.currentTimeMillis();
+
+    long time = stopTime - startTime;
+    System.out.println("  learn time: "+time);
+
+    return hmm;
   }
 
   private boolean remoteFileExists(String remoteFile){
@@ -88,9 +112,28 @@ public class Main {
     return ret;
   }
 
+  private void findMaxValue(List<File> movieFiles){
+    int ret = -1;
+    for(File file : movieFiles){
+      OfCoarseMovie movie = new OfCoarseMovie();
+      movie.open(file);
+      List<ObservationInteger> signal1 = createSignal(movie);
+      for(ObservationInteger observation : signal1){
+        int value = observation.value;
+        if(value > ret){
+          ret = value;
+        }
+      }
+    }
+    maxValue = ret;
+  }
+
   public void runTest(boolean test1){
+    List<File> movieFiles = getMovieFiles();
+    findMaxValue(movieFiles);
+    File singleMovieSource = movieFiles.get(11);
+
     Hmm hmm = null;
-    int numStates = 8160;
     String localFilename = "hmm_"+numStates+".hmm";
     File localFile = new File(localFilename);
     if(localFile.exists()){
@@ -101,7 +144,7 @@ public class Main {
         downloadFile(remoteFilename, localFilename);
         hmm = openHmm(localFilename);
       } else {
-        hmm = createHmm();
+        hmm = createHmm(singleMovieSource);
         try {
           FileOutputStream stream = new FileOutputStream(localFilename);
           HmmBinaryWriter.write(stream, hmm);
@@ -112,10 +155,8 @@ public class Main {
       }
     }
 
-    List<File> movieFiles = getMovieFiles();
-
     if(test1){
-      File file1 = movieFiles.get(11);
+      File file1 = singleMovieSource;
       OfCoarseMovie movie = new OfCoarseMovie();
       movie.open(file1);
       List<ObservationInteger> signal1 = createSignal(movie);
@@ -202,7 +243,6 @@ public class Main {
     }
     return true;
   }
-
 
   public static void main(String[] args){
     Main main = new Main();
