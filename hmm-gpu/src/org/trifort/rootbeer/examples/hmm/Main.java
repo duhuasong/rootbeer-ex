@@ -20,6 +20,9 @@ import org.trifort.coarsening.storage.Droplet;
 import org.trifort.coarsening.storage.OfCoarseMovie;
 import org.trifort.coarsening.storage.OfCoarseMovieFrame;
 
+import be.ac.ulg.montefiore.run.jahmm.OpdfIntegerFactory;
+import be.ac.ulg.montefiore.run.jahmm.learn.KMeansLearner;
+
 public class Main {
 
   private int numStates;
