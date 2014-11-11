@@ -1,3 +1,4 @@
 #!/bin/sh
 
+mvn clean compile package install 
 java -jar lib/Rootbeer.jar hmm-1.0.jar hmm-gpu-1.0.jar -64bit
