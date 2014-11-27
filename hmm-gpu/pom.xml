@@ -44,11 +44,11 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.trifort.bgbk.Engine</mainClass>
+              <mainClass>org.trifort.rootbeer.examples.hmm.Main</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
-            <descriptorRef>packed-jar</descriptorRef>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
         </configuration>
       </plugin>
