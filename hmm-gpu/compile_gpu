@@ -1,3 +1,4 @@
 #!/bin/sh
 
-java -jar lib/Rootbeer.jar hmm-1.0.jar hmm-gpu-1.0.jar
+mvn clean compile package install assembly:single
+java -jar lib/Rootbeer.jar target/hmmgpu-1.0.0-jar-with-dependencies.jar hmm-gpu-1.0.jar -64bit

@@ -20,6 +20,9 @@ import org.trifort.coarsening.storage.Droplet;
 import org.trifort.coarsening.storage.OfCoarseMovie;
 import org.trifort.coarsening.storage.OfCoarseMovieFrame;
 
+import be.ac.ulg.montefiore.run.jahmm.OpdfIntegerFactory;
+import be.ac.ulg.montefiore.run.jahmm.learn.KMeansLearner;
+
 public class Main {
 
   private int numStates;
@@ -144,7 +147,11 @@ public class Main {
         downloadFile(remoteFilename, localFilename);
         hmm = openHmm(localFilename);
       } else {
-        hmm = createHmm(singleMovieSource);
+        try {
+    	  hmm = createHmm(singleMovieSource);
+        } catch(OutOfMemoryError ex){
+          ex.printStackTrace();
+        }
         try {
           FileOutputStream stream = new FileOutputStream(localFilename);
           HmmBinaryWriter.write(stream, hmm);
@@ -201,7 +208,7 @@ public class Main {
       if(droplet.getVolume() < 1){
         continue;
       }
-      radii.add((int) droplet.getVolume());
+      radii.add((int) droplet.getRadius());
     }
 
     Collections.sort(radii);

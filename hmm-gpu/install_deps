@@ -1,0 +1,10 @@
+#!/bin/bash
+
+mvn install:install-file -Dfile=lib/myxo-coarsening-1.0.jar -DgroupId=org.trifort -DartifactId=myxo-coarsening -Dversion=1.0 -Dpackaging=jar
+
+mvn install:install-file -Dfile=lib/Rootbeer.jar -DgroupId=org.trifort -DartifactId=rootbeer -Dversion=1.0 -Dpackaging=jar
+
+mvn install:install-file -Dfile=lib/jahmm-0.6.1.jar -DgroupId=be.ac.ulg.montefiore.run.jahmm -DartifactId=jahmm -Dversion=0.6.1 -Dpackaging=jar
+
+
+

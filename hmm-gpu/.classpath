@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/commons-io/commons-io/2.4/commons-io-2.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/be/ac/ulg/montefiore/run/jahmm/jahmm/0.6.1/jahmm-0.6.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/trifort/myxo-coarsening/1.0/myxo-coarsening-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/trifort/rootbeer/1.0/rootbeer-1.0.jar"/>
+</classpath>
