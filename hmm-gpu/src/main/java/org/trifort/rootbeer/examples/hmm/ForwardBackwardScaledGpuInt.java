@@ -30,6 +30,41 @@ public class ForwardBackwardScaledGpuInt {
     }
   }
 
+  private void printPi(HmmGpuInt hmm, int numBlocks, int numThreads)
+  {
+    System.out.println("pi");
+    for(int i = 0; i < numBlocks; ++i){
+      for(int j = 0; j < numThreads; ++j){
+        int totalIndex = (i * numThreads) + j;
+        System.out.print(hmm.getPi(totalIndex)+" ");
+      }
+      System.out.println();
+    }
+  }
+
+  private void printProb(HmmGpuInt hmm, int numBlocks, int numThreads, int o)
+  {
+    System.out.println("prob");
+    for(int i = 0; i < numBlocks; ++i){
+      for(int j = 0; j < numThreads; ++j){
+        int totalIndex = (i * numThreads) + j;
+        System.out.print(hmm.getOpdf(totalIndex).probability(o)+" ");
+      }
+      System.out.println();
+    }
+  }
+
+  private void printRows(float[][] rows)
+  {
+    System.out.println("rows");
+    for(int i = 0; i < rows.length; ++i){
+      for(int j = 0; j < rows[0].length; ++j){
+        System.out.print(rows[i][j]+" ");
+      }
+      System.out.println();
+    }
+  }
+
   private void computeGPU(HmmGpuInt hmm, int[] oseq) {
     System.out.println("computeAlphaGPU");
 
@@ -40,12 +75,15 @@ public class ForwardBackwardScaledGpuInt {
     alphaN = new float[numBlocks*numThreads];
 
     int o = oseq[0];
+    printPi(hmm, numBlocks, numThreads);
+    printProb(hmm, numBlocks, numThreads, o);
     for(int i = 0; i < numBlocks; ++i){
       for(int j = 0; j < numThreads; ++j){
         int totalIndex = (i * numThreads) + j;
         float pi = hmm.getPi(totalIndex);
         float prob = hmm.getOpdf(totalIndex).probability(o);
-        alpha0[i*numThreads+j] = pi * prob;
+        float pi_prob = pi * prob;
+        alpha0[i*numThreads+j] = pi_prob;
       }
     }
 
@@ -56,6 +94,8 @@ public class ForwardBackwardScaledGpuInt {
     context.setThreadConfig(numThreads, numBlocks, numThreads * numBlocks);
     context.buildState();
     context.run();
+
+    printRows(rows);
 
     StatsRow row = context.getStats();
     System.out.println("serial: "+row.getSerializationTime());
