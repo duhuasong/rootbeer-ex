@@ -34,7 +34,7 @@ public class ForwardBackwardScaledGpuInt {
     System.out.println("computeAlphaGPU");
 
     int numThreads = 96;
-    int numBlocks = 50;
+    int numBlocks = 85;
 
     alpha0 = new float[numBlocks*numThreads];
     alphaN = new float[numBlocks*numThreads];

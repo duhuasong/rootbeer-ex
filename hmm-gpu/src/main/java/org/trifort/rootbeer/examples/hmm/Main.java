@@ -148,7 +148,7 @@ public class Main {
         hmm = openHmm(localFilename);
       } else {
         try {
-    	  hmm = createHmm(singleMovieSource);
+    	    hmm = createHmm(singleMovieSource);
         } catch(OutOfMemoryError ex){
           ex.printStackTrace();
         }
@@ -180,7 +180,7 @@ public class Main {
 
       startTime = System.currentTimeMillis();
       forwardBackward =
-          new ForwardBackwardScaledGpuInt(convert(signal1), new HmmGpuInt(hmm), false);
+        new ForwardBackwardScaledGpuInt(convert(signal1), new HmmGpuInt(hmm), false);
       prob = forwardBackward.probability();
       stopTime = System.currentTimeMillis();
       time = stopTime - startTime;
