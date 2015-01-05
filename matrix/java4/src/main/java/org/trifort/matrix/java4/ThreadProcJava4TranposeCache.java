@@ -7,15 +7,17 @@ public class ThreadProcJava4TranposeCache implements Runnable {
   private double[][] c;
   private int index;
   private int workItems;
+  private int blockSize;
   
   public ThreadProcJava4TranposeCache(double[][] a, double[][] b, double[][] c, 
-      int index, int workItems){
+      int index, int workItems, int blockSize){
     
     this.a = a;
     this.b = b;
     this.c = c;
     this.index = index;
     this.workItems = workItems;
+    this.blockSize = blockSize;
   }
   
 	public void run(){
@@ -27,7 +29,6 @@ public class ThreadProcJava4TranposeCache implements Runnable {
 	  for(int i = startIndex; i < endIndex; ++i){
 	    for(int j = 0; j < size; ++j){
 	      double sum = 0;
-	      int blockSize = 8;
 	      for(int k = 0; k < size; k += blockSize){
 	        for(int kk = 0; kk < blockSize; ++kk){
 	          sum += a[i][k+kk] * b[j][k+kk];

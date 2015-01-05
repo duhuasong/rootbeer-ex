@@ -27,7 +27,7 @@ public class ThreadProcJava4Cache implements Runnable {
 	  for(int i = startIndex; i < endIndex; ++i){
 	    for(int j = 0; j < size; ++j){
 	      double sum = 0;
-	      int blockSize = 8;
+	      int blockSize = 4;
 	      for(int k = 0; k < size; k += blockSize){
 	        for(int kk = 0; kk < blockSize; ++kk){
 	          sum += a[i][k+kk] * b[k+kk][j];
