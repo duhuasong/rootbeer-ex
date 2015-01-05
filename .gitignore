@@ -5,3 +5,6 @@ output.txt
 sootOutput/
 hmm_8160.hmm
 target/
+.classpath
+.settings
+.project
