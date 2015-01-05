@@ -6,12 +6,12 @@ import java.util.List;
 import org.apache.commons.lang3.time.StopWatch;
 import org.trifort.matrix.gold.MatrixGold;
 
-public class MatrixJava4 {
+public class MatrixJava4Transpose {
 
   public void run(){
     int size = MatrixGold.size();
     double[][] a = MatrixGold.createAB();
-    double[][] b = MatrixGold.createAB();
+    double[][] b = MatrixGold.createTransposeB();
     double[][] c = new double[size][size];
     
     int threadCount = 4;
@@ -21,7 +21,7 @@ public class MatrixJava4 {
     StopWatch watch = new StopWatch();
     watch.start();
     for(int i = 0; i < threadCount; ++i){
-      ThreadProcJava4 proc = new ThreadProcJava4(a, b, c, i, workItems);
+      ThreadProcJava4Transpose proc = new ThreadProcJava4Transpose(a, b, c, i, workItems);
       Thread thread = new Thread(proc);
       thread.start();
       threads.add(thread);
@@ -44,7 +44,7 @@ public class MatrixJava4 {
   }
 
   public static void main(String[] args){
-    MatrixJava4 engine = new MatrixJava4();
+    MatrixJava4Transpose engine = new MatrixJava4Transpose();
     try {
       //run 8 times to allow jvm code optimizations to run
       for(int i = 0; i < 8; ++i){
