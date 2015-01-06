@@ -32,7 +32,7 @@ public class MatrixRBBasic {
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
     GpuDevice device0 = devices.get(0);
-    Context context0 = device0.createContext();
+    Context context0 = device0.createContext(100884688);
     context0.setCacheConfig(CacheConfig.PREFER_SHARED);
     context0.setThreadConfig(threadCount, blockCount, threadCount * blockCount);
     context0.setKernel(new MatrixKernel(a, b, c));

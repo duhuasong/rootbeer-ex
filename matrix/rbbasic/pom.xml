@@ -65,7 +65,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>org.trifort.matrix.java4.MatrixJava4</mainClass>
+              <mainClass>org.trifort.matrix.rbbasic.MatrixRBBasic</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
