@@ -12,9 +12,6 @@ public class MatrixKernel implements Kernel {
   private static final int SIZE_DOUBLE = 8;
   private static final int TILE_SIZE = 32;
   private static final int SHARED_B_START = TILE_SIZE * TILE_SIZE * SIZE_DOUBLE;
-  private static final int TILES_PER_BLOCK = 4;
-  private static final int MATRIX_SIZE = 2048;
-  private static final int TILES_PER_MATRIX = MATRIX_SIZE / TILE_SIZE;
   
   public MatrixKernel(double[][] a, double[][] b, double[][] c){
     this.a = a;
@@ -34,36 +31,24 @@ public class MatrixKernel implements Kernel {
     int j = threadId % size;
     
     int threadIdxx = RootbeerGpu.getThreadIdxx();
-    int blockIdxx = RootbeerGpu.getBlockIdxx();
+    int threadIdxy = RootbeerGpu.getThreadIdxy();
+    
+    double valueA = registerA[i][j];
+    double valueB = registerB[i][j];
+    
+    RootbeerGpu.setSharedDouble(((threadIdxy * TILE_SIZE) + threadIdxx) * SIZE_DOUBLE, valueA);
+    RootbeerGpu.setSharedDouble((SHARED_B_START + ((threadIdxy * TILE_SIZE) + threadIdxx)) * SIZE_DOUBLE, valueB);
 
-    int tileRowA = i / TILES_PER_MATRIX;
-    int tileColB = j / TILES_PER_MATRIX;
-    
-    int tileRowAStart = tileRowA * TILE_SIZE;
-    int tileColBStart = tileColB * TILE_SIZE; 
-    
     double sum = 0;
-    
-    for(int tileA = 0; tileA < TILES_PER_BLOCK; ++tileA){
-      for(int tileB = 0; tileB < TILES_PER_BLOCK; ++tileB){
-        for(int tileLoadRow = 0; tileLoadRow < TILE_SIZE; tileLoadRow += 2){
-          int tileLoadRowStart = threadIdxx / 2;
-          int tileLoadColStart = threadIdxx / 4;
-          int indexRow = tileRowAStart + tileLoadRowStart;
-          int indexCol = tileColBStart + tileLoadColStart;
-          double valueA = registerA[indexRow][indexCol];  
-          
-          long valueALong = Double.doubleToLongBits(valueA);
-          //bitmask to find int0 and int1
-          
-          
-        }
-      }
+    for(int k = 0; k < size; ++k){
+      //sum += registerA[i][k] * registerB[j][k];
+      int indexA = ((threadIdxy * TILE_SIZE) + k) * SIZE_DOUBLE;
+      int indexB = ((threadIdxy * TILE_SIZE) + k) * SIZE_DOUBLE;
+      
+      valueA = RootbeerGpu.getSharedDouble(indexA);
+      valueB = RootbeerGpu.getSharedDouble(indexB);
+      sum += valueA * valueB;
     }
-    
-    //for(int k = 0; k < size; ++k){
-    //  sum += registerA[i][k] * registerB[j][k];
-    //}
     
     RootbeerGpu.atomicAddGlobal(registerC[i], j, sum);
   }

@@ -15,8 +15,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.trifort</groupId>
-      <artifactId>rootbeer</artifactId>
+      <groupId>org.trifort.rootbeer</groupId>
+      <artifactId>rootbeer1</artifactId>
       <version>1.2.3</version>
     </dependency>
     <dependency>
@@ -25,9 +25,9 @@
       <version>1.0.0</version>
     </dependency>
     <dependency>
-	    <groupId>org.apache.commons</groupId>
-	    <artifactId>commons-lang3</artifactId>
-	    <version>3.3.2</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.3.2</version>
     </dependency>
   </dependencies>
   <repositories>

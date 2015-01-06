@@ -1,4 +1,4 @@
 #!/bin/sh
 
 mvn compile package install assembly:single
-java -jar lib/Rootbeer-1.2.3.jar target/matrix-rbshared-1.0.0-jar-with-dependencies.jar matrix-rbshared-gpu-1.0.0.jar -noexceptions -noarraychecks -64bit -shared-mem-size 16384
+java -jar lib/Rootbeer.jar target/matrix-rbshared-1.0.0-jar-with-dependencies.jar matrix-rbshared-gpu-1.0.0.jar -noexceptions -noarraychecks -64bit -shared-mem-size 16384
