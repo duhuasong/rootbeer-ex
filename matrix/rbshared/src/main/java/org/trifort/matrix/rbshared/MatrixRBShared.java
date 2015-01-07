@@ -26,18 +26,21 @@ public class MatrixRBShared {
     double[][] b = MatrixGold.createAB();
     double[][] c = new double[size][size];
     
-    int blockCount = 4096;
-    int threadCount = 1024;
+    int blockCountX = 64;
+    int blockCountY = 64;
+    int threadCountX = 32;
+    int threadCountY = 32;
+    int numThreads = blockCountX * blockCountY * threadCountX * threadCountY;
     
     Rootbeer rootbeer = new Rootbeer();
     List<GpuDevice> devices = rootbeer.getDevices();
     GpuDevice device0 = devices.get(0);
     Context context0 = device0.createContext();
     context0.setCacheConfig(CacheConfig.PREFER_SHARED);
-    context0.setThreadConfig(threadCount, blockCount, threadCount * blockCount);
+    context0.setThreadConfig(threadCountX, threadCountY, blockCountX, blockCountY, numThreads);
     context0.setKernel(new MatrixKernel(a, b, c));
     context0.buildState();
-    
+ 
     for(int i = 0; i < 8; ++i){
       clearArray(c);
       StopWatch watch = new StopWatch();

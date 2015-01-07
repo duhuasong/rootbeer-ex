@@ -36,20 +36,35 @@ public class MatrixKernel implements Kernel {
     double valueA = registerA[i][j];
     double valueB = registerB[i][j];
     
-    RootbeerGpu.setSharedDouble(((threadIdxy * TILE_SIZE) + threadIdxx) * SIZE_DOUBLE, valueA);
-    RootbeerGpu.setSharedDouble((SHARED_B_START + ((threadIdxy * TILE_SIZE) + threadIdxx)) * SIZE_DOUBLE, valueB);
-
+    int indexA = ((threadIdxy * TILE_SIZE) + threadIdxx) * SIZE_DOUBLE;
+    int indexB = (SHARED_B_START + ((threadIdxy * TILE_SIZE) + threadIdxx)) * SIZE_DOUBLE;
+    
+    if(threadIdxx == 2 && threadIdxy == 8){
+      int blockIdxx = RootbeerGpu.getBlockIdxx();
+      int blockIdxy = RootbeerGpu.getBlockIdxy();
+      
+      if(blockIdxx == 6 && blockIdxy == 0){
+        System.out.println("indexA: "+indexA);
+        System.out.println("indexB: "+indexB);
+      }
+    }
+    
+    RootbeerGpu.setSharedDouble(indexA, valueA);
+    RootbeerGpu.setSharedDouble(indexB, valueB);
+    RootbeerGpu.syncthreads();
+    
     double sum = 0;
     for(int k = 0; k < size; ++k){
       //sum += registerA[i][k] * registerB[j][k];
-      int indexA = ((threadIdxy * TILE_SIZE) + k) * SIZE_DOUBLE;
-      int indexB = ((threadIdxy * TILE_SIZE) + k) * SIZE_DOUBLE;
+      
+      indexA = ((threadIdxy * TILE_SIZE) + k) * SIZE_DOUBLE;
+      indexB = ((threadIdxy * TILE_SIZE) + k) * SIZE_DOUBLE;
       
       valueA = RootbeerGpu.getSharedDouble(indexA);
       valueB = RootbeerGpu.getSharedDouble(indexB);
       sum += valueA * valueB;
     }
     
-    RootbeerGpu.atomicAddGlobal(registerC[i], j, sum);
+    //RootbeerGpu.atomicAddGlobal(registerC[i], j, sum);
   }
 }
