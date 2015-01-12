@@ -94,9 +94,7 @@ public class ForwardBackwardScaledGpuInt {
     context.setThreadConfig(numThreads, numBlocks, numThreads * numBlocks);
     context.buildState();
     context.run();
-
-    printRows(rows);
-
+    
     StatsRow row = context.getStats();
     System.out.println("serial: "+row.getSerializationTime());
     System.out.println("memcpy: "+row.getDriverMemcopyToDeviceTime());
@@ -186,7 +184,7 @@ public class ForwardBackwardScaledGpuInt {
       prob = (float) Math.exp(lnProbability);
     } else {
       for (int i = 0; i < hmm.nbStates(); i++) {
-				prob += alpha[oseq.length-1][i];
+        prob += alpha[oseq.length-1][i];
       }
     }
   }

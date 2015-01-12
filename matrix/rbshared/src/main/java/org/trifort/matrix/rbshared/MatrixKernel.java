@@ -44,8 +44,8 @@ public class MatrixKernel implements Kernel {
       int blockIdxy = RootbeerGpu.getBlockIdxy();
       
       if(blockIdxx == 6 && blockIdxy == 0){
-        System.out.println("indexA: "+indexA);
-        System.out.println("indexB: "+indexB);
+        System.out.println(indexA);
+        System.out.println(indexB);
       }
     }
     

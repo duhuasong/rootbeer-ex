@@ -148,7 +148,7 @@ public class Main {
         hmm = openHmm(localFilename);
       } else {
         try {
-    	    hmm = createHmm(singleMovieSource);
+          hmm = createHmm(singleMovieSource);
         } catch(OutOfMemoryError ex){
           ex.printStackTrace();
         }
