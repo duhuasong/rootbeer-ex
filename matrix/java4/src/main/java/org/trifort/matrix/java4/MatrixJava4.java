@@ -10,9 +10,9 @@ public class MatrixJava4 {
 
   public void run(){
     int size = MatrixGold.size();
-    double[][] a = MatrixGold.createAB();
-    double[][] b = MatrixGold.createAB();
-    double[][] c = new double[size][size];
+    float[][] a = MatrixGold.createAB();
+    float[][] b = MatrixGold.createAB();
+    float[][] c = new float[size][size];
     
     int threadCount = 4;
     int workItems = size / threadCount;

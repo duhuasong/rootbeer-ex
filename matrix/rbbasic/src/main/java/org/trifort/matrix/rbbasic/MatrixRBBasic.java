@@ -12,7 +12,7 @@ import org.trifort.rootbeer.runtime.Rootbeer;
 
 public class MatrixRBBasic {
 
-  private void clearArray(double[][] array){
+  private void clearArray(float[][] array){
     for(int i = 0; i < array.length; ++i){
       for(int j = 0; j < array[0].length; ++j){
         array[i][j] = 0;
@@ -22,9 +22,9 @@ public class MatrixRBBasic {
   
   public void run(){
     int size = MatrixGold.size();
-    double[][] a = MatrixGold.createAB();
-    double[][] b = MatrixGold.createAB();
-    double[][] c = new double[size][size];
+    float[][] a = MatrixGold.createAB();
+    float[][] b = MatrixGold.createAB();
+    float[][] c = new float[size][size];
     
     int blockCount = 16384;
     int threadCount = 256;

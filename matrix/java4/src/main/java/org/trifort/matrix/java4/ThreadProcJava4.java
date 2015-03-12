@@ -2,13 +2,13 @@ package org.trifort.matrix.java4;
 
 public class ThreadProcJava4 implements Runnable {
 
-  private double[][] a;
-  private double[][] b;
-  private double[][] c;
+  private float[][] a;
+  private float[][] b;
+  private float[][] c;
   private int index;
   private int workItems;
   
-  public ThreadProcJava4(double[][] a, double[][] b, double[][] c, 
+  public ThreadProcJava4(float[][] a, float[][] b, float[][] c, 
       int index, int workItems){
     
     this.a = a;
@@ -26,7 +26,7 @@ public class ThreadProcJava4 implements Runnable {
 	  
 	  for(int i = startIndex; i < endIndex; ++i){
 	    for(int j = 0; j < size; ++j){
-	      double sum = 0;
+	      float sum = 0;
 	      for(int k = 0; k < size; ++k){
 	        sum += a[i][k] * b[k][j];
 	      }

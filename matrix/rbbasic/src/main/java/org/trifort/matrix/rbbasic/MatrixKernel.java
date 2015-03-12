@@ -5,11 +5,11 @@ import org.trifort.rootbeer.runtime.RootbeerGpu;
 
 public class MatrixKernel implements Kernel {
 
-  private double[][] a;
-  private double[][] b;
-  private double[][] c;
+  private float[][] a;
+  private float[][] b;
+  private float[][] c;
   
-  public MatrixKernel(double[][] a, double[][] b, double[][] c){
+  public MatrixKernel(float[][] a, float[][] b, float[][] c){
     this.a = a;
     this.b = b;
     this.c = c;
@@ -17,16 +17,16 @@ public class MatrixKernel implements Kernel {
   
   @Override
   public void gpuMethod() {
-    double[][] registerA = a;
-    double[][] registerB = b;
-    double[][] registerC = c;
+    float[][] registerA = a;
+    float[][] registerB = b;
+    float[][] registerC = c;
     int size = registerA.length;
     
     int threadId = RootbeerGpu.getThreadId();
     int i = threadId / size;
     int j = threadId % size;
 
-    double sum = 0;
+    float sum = 0;
     for(int k = 0; k < size; ++k){
       sum += registerA[i][k] * registerB[k][j];
     }

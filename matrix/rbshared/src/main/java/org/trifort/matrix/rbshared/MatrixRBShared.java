@@ -51,6 +51,8 @@ public class MatrixRBShared {
       boolean match = MatrixGold.checkC(c);
       if(match){
         System.out.println("TEST PASSES: "+watch.getTime()+"ms");
+      } else {
+        System.out.println("TEST FAILS: "+watch.getTime()+"ms");
       }
     }
   }
