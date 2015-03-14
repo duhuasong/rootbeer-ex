@@ -12,24 +12,22 @@ import org.trifort.rootbeer.runtime.Rootbeer;
 
 public class MatrixRBShared {
 
-  private void clearArray(float[][] array){
+  private void clearArray(float[] array){
     for(int i = 0; i < array.length; ++i){
-      for(int j = 0; j < array[0].length; ++j){
-        array[i][j] = 0;
-      }
+      array[i] = 0;
     }
   }
   
   public void run(){
     int size = MatrixGold.size();
-    float[][] a = MatrixGold.createAB();
-    float[][] b = MatrixGold.createAB();
-    float[][] c = new float[size][size];
+    float[] a = MatrixGold.createABSingle();
+    float[] b = MatrixGold.createABSingle();
+    float[] c = new float[size*size];
     
-    int blockCountX = 64;
-    int blockCountY = 64;
-    int threadCountX = 32;
-    int threadCountY = 32;
+    int blockCountX = 128;
+    int blockCountY = 128;
+    int threadCountX = 16;
+    int threadCountY = 16;
     int numThreads = blockCountX * blockCountY * threadCountX * threadCountY;
     
     Rootbeer rootbeer = new Rootbeer();
@@ -48,7 +46,7 @@ public class MatrixRBShared {
       context0.run();
       watch.stop();
 
-      boolean match = MatrixGold.checkC(c);
+      boolean match = MatrixGold.checkCSingle(c);
       if(match){
         System.out.println("TEST PASSES: "+watch.getTime()+"ms");
       } else {

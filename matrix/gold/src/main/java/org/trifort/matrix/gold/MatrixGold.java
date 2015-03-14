@@ -10,10 +10,22 @@ public class MatrixGold {
   
   public static float[][] createAB(){
     float[][] ret = new float[SIZE][SIZE];
-    int index = 1;
+    int index = 0;
     for(int i = 0; i < SIZE; ++i){
       for(int j = 0; j < SIZE; ++j){
-        ret[i][j] = (float) index;
+        ret[i][j] = (float) index % 8;
+        ++index;
+      }
+    }
+    return ret;
+  }
+
+  public static float[] createABSingle(){
+    float[] ret = new float[SIZE*SIZE];
+    int index = 0;
+    for(int i = 0; i < SIZE; ++i){
+      for(int j = 0; j < SIZE; ++j){
+        ret[index] = (float) index % 8;
         ++index;
       }
     }
@@ -22,10 +34,10 @@ public class MatrixGold {
 
   public static float[][] createTransposeB(){
     float[][] ret = new float[SIZE][SIZE];
-    int index = 1;
+    int index = 0;
     for(int i = 0; i < SIZE; ++i){
       for(int j = 0; j < SIZE; ++j){
-        ret[j][i] = (float) index;
+        ret[j][i] = (float) index % 8;
         ++index;
       }
     }
@@ -73,6 +85,35 @@ public class MatrixGold {
             System.out.println("mismatch at ["+i+"]["+j+"]");
             System.out.println("  lhs: "+lhs);
             System.out.println("  rhs: "+rhs);
+            System.out.println("  diff: "+Math.abs(lhs - rhs));
+            ret = false;
+          } 
+          ++errorCount;
+        }
+      }
+    }
+    if(errorCount > 1){
+      System.out.println(errorCount+" other mismatches.");
+    }
+    return ret;
+  }
+
+  public static boolean checkCSingle(float[] c){
+    float[][] gold = createC();
+    
+    boolean ret = true;
+    int errorCount = 0;
+    for(int i = 0; i < gold.length; ++i){
+      for(int j = 0; j < gold[0].length; ++j){
+        float lhs = gold[i][j];
+        float rhs = c[i*SIZE+j];
+        
+        if(Math.abs(lhs - rhs) > 0.0001){
+          if(ret == true){
+            System.out.println("mismatch at ["+i+"]["+j+"]");
+            System.out.println("  lhs: "+lhs);
+            System.out.println("  rhs: "+rhs);
+            System.out.println("  diff: "+Math.abs(lhs - rhs));
             ret = false;
           } 
           ++errorCount;
