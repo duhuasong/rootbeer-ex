@@ -23,14 +23,14 @@ public class MatrixAparapi {
     final float[][] b = MatrixGold.createAB();
     final float[][] c = new float[size][size];
     
-    int blockCount = 16384;
-    int threadCount = 256;
+    final int blockCount = 16384;
+    final int threadCount = 256;
     
     StopWatch watch = new StopWatch();
     watch.start();
 
     Device gpuDevice0 = Device.best();
-    Range range = gpuDevice0.createRange(blockCount, threadCount);
+    Range range = gpuDevice0.createRange(blockCount*threadCount);
     Kernel kernel = new Kernel(){
       @Override public void run(){
         int threadId = getGlobalId();
@@ -50,6 +50,8 @@ public class MatrixAparapi {
     boolean match = MatrixGold.checkC(c);
     if(match){
       System.out.println("TEST PASSES: "+watch.getTime()+"ms");
+    } else {
+      System.out.println("TEST FAILS: "+watch.getTime()+"ms");
     }
   }
 
