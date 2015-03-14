@@ -1,0 +1,3 @@
+#!/bin/sh
+
+/usr/local/cuda/bin/nvcc -arch sm_20 matrixMultSimple.cu UnixStopwatch.cpp
