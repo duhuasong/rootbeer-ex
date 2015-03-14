@@ -10,6 +10,7 @@ public class MatrixKernel implements Kernel {
   private float[] b;
   private float[] c;
   
+  private static final int SIZE_FLOAT = 4;
   private static final int TILE_SIZE = 16;
   private static final int SHARED_B_START = TILE_SIZE * TILE_SIZE;
   
@@ -49,9 +50,9 @@ public class MatrixKernel implements Kernel {
     
       int indexA = ((threadIdxy * TILE_SIZE) + threadIdxx);
       int indexB = SHARED_B_START + ((threadIdxy * TILE_SIZE) + threadIdxx);
-    
-      RootbeerGpu.setSharedFloat(indexA, valueA);
-      RootbeerGpu.setSharedFloat(indexB, valueB);
+
+      RootbeerGpu.setSharedFloat(indexA * SIZE_FLOAT, valueA);
+      RootbeerGpu.setSharedFloat(indexB * SIZE_FLOAT, valueB);
       RootbeerGpu.syncthreads();
       
       for(int k = 0; k < TILE_SIZE; ++k){
@@ -60,8 +61,8 @@ public class MatrixKernel implements Kernel {
         indexA = ((threadIdxy * TILE_SIZE) + k);
         indexB = SHARED_B_START + ((k * TILE_SIZE) + threadIdxx);
         
-        valueA = RootbeerGpu.getSharedFloat(indexA);
-        valueB = RootbeerGpu.getSharedFloat(indexB);
+        valueA = RootbeerGpu.getSharedFloat(indexA * SIZE_FLOAT);
+        valueB = RootbeerGpu.getSharedFloat(indexB * SIZE_FLOAT);
         sum += valueA * valueB;
       }
 
