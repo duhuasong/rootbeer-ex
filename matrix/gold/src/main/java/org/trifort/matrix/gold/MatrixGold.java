@@ -109,7 +109,7 @@ public class MatrixGold {
         float rhs = c[i*SIZE+j];
         
         if(Math.abs(lhs - rhs) > 0.0001){
-          if(ret == true){
+          if(ret == true || errorCount < 5){
             System.out.println("mismatch at ["+i+"]["+j+"]");
             System.out.println("  lhs: "+lhs);
             System.out.println("  rhs: "+rhs);
