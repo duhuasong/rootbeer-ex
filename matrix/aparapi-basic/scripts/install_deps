@@ -1,0 +1,5 @@
+#!/bin/sh
+
+mvn install:install-file -Dfile=../lib/aparapi.jar -DgroupId=aparapi \
+    -DartifactId=aparapi -Dversion=997 -Dpackaging=jar
+
