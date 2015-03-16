@@ -4,6 +4,7 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.trifort.matrix.gold.MatrixGold;
 
 import com.amd.aparapi.device.Device;
+import com.amd.aparapi.exception.DeprecatedException;
 import com.amd.aparapi.Kernel;
 import com.amd.aparapi.Kernel.PrivateMemorySpace;
 import com.amd.aparapi.Range;
@@ -33,21 +34,25 @@ public class MatrixAparapi {
     watch.start();
     
     Device gpuDevice0 = Device.best();
-    Range range = gpuDevice0.createRange2D(blockCountX, blockCountY,
-        threadCountX, threadCountY);
+    Range range = gpuDevice0.createRange2D(blockCountX*threadCountX, 
+        blockCountY*threadCountY);
     Kernel kernel = new Kernel(){
 
       final int TILE_SIZE = 16;
       final int SHARED_SIZE = TILE_SIZE * TILE_SIZE;
-      protected @PrivateMemorySpace(SHARED_SIZE) float[] shared_a = new float[SHARED_SIZE];
-      protected @PrivateMemorySpace(SHARED_SIZE) float[] shared_b = new float[SHARED_SIZE];
+      protected @PrivateMemorySpace(2*SHARED_SIZE) float[] shared = new float[2*SHARED_SIZE];
+      
+      @Override 
+      public void run(){
 
-      @Override public void run(){
-        int blockIdxx = getGroupId(0);
-        int blockIdxy = getGroupId(1);
+        int threadIdx = getGlobalId(0);
+        int threadIdy = getGlobalId(1);
         
-        int threadIdxx = getLocalId(0);
-        int threadIdxy = getLocalId(1);
+        int blockIdxx = threadIdx / TILE_SIZE;
+        int blockIdxy = threadIdy / TILE_SIZE;
+        
+        int threadIdxx = threadIdx % TILE_SIZE;
+        int threadIdxy = threadIdy % TILE_SIZE;
         
         int width = 2048;
         int aBegin = width * TILE_SIZE * blockIdxy;
@@ -66,10 +71,10 @@ public class MatrixAparapi {
           float valueB = matrixB[b + arrayIndex];
           
           int indexA = ((threadIdxy * TILE_SIZE) + threadIdxx);
-          int indexB = ((threadIdxy * TILE_SIZE) + threadIdxx);
+          int indexB = SHARED_SIZE + ((threadIdxy * TILE_SIZE) + threadIdxx);
 
-          shared_a[indexA] = valueA;
-          shared_b[indexB] = valueB;
+          shared[indexA] = valueA;
+          shared[indexB] = valueB;
           
           localBarrier();
           
@@ -77,10 +82,10 @@ public class MatrixAparapi {
             //sum += registerA[i][k] * registerB[k][j];
             
             indexA = ((threadIdxy * TILE_SIZE) + k);
-            indexB = ((k * TILE_SIZE) + threadIdxx);
+            indexB = SHARED_SIZE + ((k * TILE_SIZE) + threadIdxx);
+            valueA = shared[indexA];
+            valueB = shared[indexB];
             
-            valueA = shared_a[indexA];
-            valueB = shared_b[indexB];
             sum += valueA * valueB;
           }
           
@@ -103,6 +108,7 @@ public class MatrixAparapi {
     } else {
       System.out.println("TEST FAILS: "+watch.getTime()+"ms");
     }
+    System.out.println("running on the gpu: "+kernel.getExecutionMode());
   }
 
   public static void main(String[] args){

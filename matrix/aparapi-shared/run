@@ -1,4 +1,4 @@
 #!/bin/sh
 
 export LD_LIBRARY_PATH=lib/
-java -jar target/matrix-aparapi-shared-1.0.0-jar-with-dependencies.jar
+java -Dcom.amd.aparapi.enableShowGeneratedOpenCL=true -jar target/matrix-aparapi-shared-1.0.0-jar-with-dependencies.jar
