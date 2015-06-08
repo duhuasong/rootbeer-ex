@@ -9,6 +9,7 @@ import org.trifort.rootbeer.runtime.CacheConfig;
 import org.trifort.rootbeer.runtime.Context;
 import org.trifort.rootbeer.runtime.GpuDevice;
 import org.trifort.rootbeer.runtime.Rootbeer;
+import org.trifort.rootbeer.runtime.StatsRow;
 
 public class MatrixRBShared {
 
@@ -52,6 +53,15 @@ public class MatrixRBShared {
       } else {
         System.out.println("TEST FAILS: "+watch.getTime()+"ms");
       }
+      
+      StatsRow row = context0.getStats();
+      System.out.println("Java Serialization Time: "+row.getSerializationTime()+"ms");
+      System.out.println("JNI Driver Memcpy to Device: "+row.getDriverMemcopyToDeviceTime()+"ms");
+      System.out.println("GPU Execution Time: "+row.getDriverExecTime()+"ms");
+      System.out.println("JNI Driver Memcpy from Device: "+row.getDriverMemcopyFromDeviceTime()+"ms");
+      System.out.println("Java Deserialization Time: "+row.getDeserializationTime()+"ms");
+      
+      
     }
   }
 
