@@ -11,11 +11,12 @@ public class Main {
 
   public void runTest(){
 
+    int signalLength = 8000;
     int numStates = 196;
     int numThreads = 14;
     int numBlocks = 14;
     int memorySize1 = 157485664;
-    double[][] delta = new double[8000][numStates];
+    double[][] delta = new double[signalLength][numStates];
     
     for (int i = 0; i < numStates; i++) {
       delta[0][i] = 1.0;
@@ -33,7 +34,7 @@ public class Main {
     context.buildState();
     context.run();
     
-    System.out.println("last_sum: "+delta[7999][0]);
+    System.out.println("last_sum: "+delta[signalLength-1][0]);
     context.close();
   }
   
@@ -60,9 +61,9 @@ public class Main {
   }
   
   public void run(){
-    for(int i = 0; i < 250; ++i){
+    //for(int i = 0; i < 250; ++i){
       runTest();
-    }
+    //}
   }
   
   public static void main(String[] args){

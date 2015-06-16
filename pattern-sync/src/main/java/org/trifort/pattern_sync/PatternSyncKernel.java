@@ -25,9 +25,7 @@ public class PatternSyncKernel implements Kernel {
       }
       delta[i][threadId] = rowSum / (double) innerLength;
       RootbeerGpu.threadfenceSystem();
-      globalSync(i*3);
-      globalSync((i*3)+1);
-      globalSync((i*3)+2);
+      globalSync(i);
     }
   }
   
@@ -53,6 +51,10 @@ public class PatternSyncKernel implements Kernel {
         match = 0;
       }
       count = RootbeerGpu.syncthreadsCount(match);
+      ++iter;
+      if(iter > 2048){
+        break;
+      }
     }
   }
 }

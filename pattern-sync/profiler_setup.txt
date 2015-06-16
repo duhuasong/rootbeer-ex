@@ -1,0 +1,7 @@
+gridsize3d
+threadblocksize
+dynsmemperblock
+stasmemperblock
+regperthread
+cacheconfigrequested
+cacheconfigexecuted

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+export COMPUTE_PROFILE=1
+export COMPUTE_PROFILE_CONFIG=profiler_setup.txt
+java -jar pattern-sync.jar
