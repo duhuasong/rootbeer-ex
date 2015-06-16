@@ -23,12 +23,12 @@ public class PatternSyncKernel implements Kernel {
       for(int j = 0; j < innerLength; ++j){
         rowSum += delta[i-1][j];
       }
-      delta[i][threadId] = rowSum;
+      delta[i][threadId] = rowSum / (double) innerLength;
       RootbeerGpu.threadfenceSystem();
-      //globalSync(i, length - 1);
+      globalSync(i, length - 1);
     }
   }
-  /*
+  
   private void globalSync(int goal_value, int end){
     int[] local_barrier = barrier;
     int count = 0;
@@ -62,5 +62,4 @@ public class PatternSyncKernel implements Kernel {
       }
     }
   }
-  */
 }
