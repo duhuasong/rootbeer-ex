@@ -51,6 +51,10 @@ public class PatternSyncKernel implements Kernel {
         match = 0;
       }
       count = RootbeerGpu.syncthreadsCount(match);
+      ++iter;
+      if(iter > 2000){
+        break;
+      }
     }
     
     if(RootbeerGpu.getBlockIdxx() == 0 && goal_value == end){
