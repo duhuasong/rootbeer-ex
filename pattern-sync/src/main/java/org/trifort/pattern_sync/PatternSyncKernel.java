@@ -25,11 +25,13 @@ public class PatternSyncKernel implements Kernel {
       }
       delta[i][threadId] = rowSum / (double) innerLength;
       RootbeerGpu.threadfenceSystem();
-      globalSync(i, length - 1);
+      globalSync(i*3);
+      globalSync((i*3)+1);
+      globalSync((i*3)+2);
     }
   }
   
-  private void globalSync(int goal_value, int end){
+  private void globalSync(int goal_value){
     int[] local_barrier = barrier;
     int count = 0;
     int iter = 0;
@@ -51,19 +53,6 @@ public class PatternSyncKernel implements Kernel {
         match = 0;
       }
       count = RootbeerGpu.syncthreadsCount(match);
-      ++iter;
-      if(iter > 2000){
-        break;
-      }
-    }
-    
-    if(RootbeerGpu.getBlockIdxx() == 0 && goal_value == end){
-      for(int i = 0; i < 28; ++i){
-        if(i == RootbeerGpu.getThreadIdxx()){
-          System.out.println(RootbeerGpu.getThreadIdxx()+" -> "+thread_value+" -> "+count);
-        }
-        RootbeerGpu.syncthreads();
-      }
     }
   }
 }
