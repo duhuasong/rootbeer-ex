@@ -2,4 +2,4 @@
 
 rm pattern-sync.jar
 mvn compile package install assembly:single
-java -Xmx2g -jar lib/Rootbeer-1.2.4.jar target/pattern-sync-1.0.0-jar-with-dependencies.jar pattern-sync.jar -64bit -noexceptions -noarraychecks
+java -Xmx2g -jar lib/Rootbeer-1.2.4.jar target/pattern-sync-1.0.0-jar-with-dependencies.jar pattern-sync.jar -64bit -noexceptions -noarraychecks -maxrregcount 32 -shared-mem-size 4
