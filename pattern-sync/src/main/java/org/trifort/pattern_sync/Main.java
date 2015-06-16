@@ -11,9 +11,9 @@ public class Main {
 
   public void runTest(){
 
-    int numStates = 784;
-    int numThreads = 28;
-    int numBlocks = 28;
+    int numStates = 196;
+    int numThreads = 14;
+    int numBlocks = 14;
     int memorySize1 = 157485664;
     double[][] delta = new double[8000][numStates];
     
